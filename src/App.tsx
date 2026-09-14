@@ -11,7 +11,6 @@ import {
 } from './data/presets'
 import { rankProducts } from './lib/rank'
 import { RangeField, SegmentedControl, ToggleChip } from './components/ui'
-import heroImage from './assets/hero.jpg'
 import './App.css'
 
 function detectPreset(filters: Filters): PresetId {
@@ -27,13 +26,30 @@ function formatWon(value: number) {
   return `${value.toLocaleString('ko-KR')}원`
 }
 
+function buildChips(filters: Filters): string[] {
+  const chips = [
+    `고기 ${filters.meatMin}%↑`,
+    `알 ${filters.kibbleMax}mm↓`,
+    `kg당 ${formatWon(filters.priceMaxPerKg)}↓`,
+  ]
+  if (filters.vegetables === 'yes') chips.push('채소 포함')
+  if (filters.vegetables === 'no') chips.push('채소 없음')
+  if (filters.grainFree) chips.push('그레인프리')
+  if (filters.singleProtein) chips.push('단일단백')
+  if (filters.prioritizePalatability) chips.push('기호성 우선')
+  if (filters.prioritizeDiet) chips.push('다이어트 우선')
+  return chips
+}
+
 export default function App() {
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
   const [activeConcern, setActiveConcern] = useState<ConcernId | null>(null)
-  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(true)
 
   const activePreset = detectPreset(filters)
   const ranked = useMemo(() => rankProducts(products, filters), [filters])
+  const chips = buildChips(filters)
+  const speciesLabel = filters.species === 'dog' ? '강아지' : '고양이'
 
   function patchFilters(patch: Partial<Filters>) {
     startTransition(() => {
@@ -44,101 +60,149 @@ export default function App() {
   function applyPreset(id: Exclude<PresetId, 'custom'>) {
     setActiveConcern(null)
     startTransition(() => {
-      setFilters((prev) => ({
-        ...prev,
-        ...PRESETS[id].filters,
-      }))
+      setFilters((prev) => ({ ...prev, ...PRESETS[id].filters }))
     })
   }
 
   function applyConcern(id: ConcernId) {
-    const concern = CONCERNS.find((c) => c.id === id)
+    const concern = CONCERNS.find((item) => item.id === id)
     if (!concern) return
     setActiveConcern(id)
     startTransition(() => {
-      setFilters((prev) => ({
-        ...prev,
-        ...concern.filters,
-      }))
+      setFilters((prev) => ({ ...prev, ...concern.filters }))
     })
   }
 
   return (
     <div className="page">
-      <header className="topnav">
-        <a className="topnav__brand" href="#top">
-          골라먹
-        </a>
-        <SegmentedControl
-          label="반려 종류"
-          value={filters.species}
-          options={[
-            { value: 'dog', label: '강아지' },
-            { value: 'cat', label: '고양이' },
-          ]}
-          onChange={(species) => patchFilters({ species })}
-        />
-      </header>
+      <header className="masthead">
+        <div className="masthead__inner">
+          <a className="logo" href="#top">
+            <span className="logo__mark">골</span>
+            <span className="logo__text">
+              골라먹
+              <small>사료 스펙 비교</small>
+            </span>
+          </a>
 
-      <section className="hero" id="top" aria-label="골라먹 소개">
-        <div className="hero__media" aria-hidden="true">
-          <img
-            src={heroImage}
-            alt=""
-            width={1800}
-            height={1059}
-            fetchPriority="high"
-          />
-          <div className="hero__veil" />
-        </div>
-
-        <div className="hero__content">
-          <p className="hero__eyebrow">조건으로 고르는 반려 사료</p>
-          <h1 className="hero__brand">골라먹</h1>
-          <p className="hero__headline">스마트폰 고르듯, 사료도 스펙으로</p>
-          <p className="hero__sub">
-            기본값을 열어두고, 내 조건에 맞게 순위를 다시 맞춘다
-          </p>
-
-          <div className="presets" role="group" aria-label="시작 프리셋">
-            {(Object.keys(PRESETS) as Array<keyof typeof PRESETS>).map((id) => (
-              <button
-                key={id}
-                type="button"
-                className={`preset${activePreset === id ? ' is-active' : ''}`}
-                onClick={() => applyPreset(id)}
-              >
-                <span className="preset__label">{PRESETS[id].label}</span>
-                <span className="preset__hint">{PRESETS[id].hint}</span>
-              </button>
-            ))}
+          <div className="search-shell" role="search" aria-label="적용 조건 요약">
+            <span className="search-shell__prefix">{speciesLabel}</span>
+            <div className="search-shell__chips">
+              {chips.map((chip) => (
+                <span key={chip}>{chip}</span>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="search-shell__cta"
+              onClick={() =>
+                document
+                  .getElementById('results')
+                  ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+              }
+            >
+              결과 {ranked.length}
+            </button>
           </div>
 
-          <div className="concerns" aria-label="고민으로 시작">
-            {CONCERNS.map((concern) => (
-              <button
-                key={concern.id}
-                type="button"
-                className={`concern${activeConcern === concern.id ? ' is-active' : ''}`}
-                onClick={() => applyConcern(concern.id)}
-              >
-                {concern.label}
-              </button>
-            ))}
+          <SegmentedControl
+            label="반려 종류"
+            value={filters.species}
+            options={[
+              { value: 'dog', label: '강아지' },
+              { value: 'cat', label: '고양이' },
+            ]}
+            onChange={(species) => patchFilters({ species })}
+          />
+        </div>
+      </header>
+
+      <section className="finder" id="top">
+        <div className="finder__inner">
+          <div className="finder__intro">
+            <p className="finder__kicker">
+              비교 커머스형 · 조건이 바뀌면 순위가 다시 계산됩니다
+            </p>
+            <h1>
+              {speciesLabel} 사료,
+              <em> 스펙으로 줄이고 바로 고르기</em>
+            </h1>
+            <p className="finder__desc">
+              다나와처럼 스펙을 고르고, 네이버 쇼핑처럼 바로 구매로 이어집니다.
+              감성 추천이 아니라 고기함량·알 크기·가격 조건으로 후보를 좁힙니다.
+            </p>
+          </div>
+
+          <div className="mode-board">
+            <div className="mode-board__block">
+              <div className="mode-board__label">빠른 모드</div>
+              <div className="mode-tabs" role="group" aria-label="시작 프리셋">
+                {(Object.keys(PRESETS) as Array<keyof typeof PRESETS>).map(
+                  (id) => (
+                    <button
+                      key={id}
+                      type="button"
+                      className={`mode-tab${activePreset === id ? ' is-active' : ''}`}
+                      onClick={() => applyPreset(id)}
+                    >
+                      <strong>{PRESETS[id].label}</strong>
+                      <span>{PRESETS[id].hint}</span>
+                    </button>
+                  ),
+                )}
+              </div>
+            </div>
+
+            <div className="mode-board__block">
+              <div className="mode-board__label">고민별 바로가기</div>
+              <div className="concern-row">
+                {CONCERNS.map((concern) => (
+                  <button
+                    key={concern.id}
+                    type="button"
+                    className={`concern-chip${activeConcern === concern.id ? ' is-active' : ''}`}
+                    onClick={() => applyConcern(concern.id)}
+                  >
+                    {concern.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="spec-strip" aria-label="핵심 조건">
+            <div className="spec-strip__item">
+              <span>고기함량</span>
+              <strong>{filters.meatMin}% 이상</strong>
+            </div>
+            <div className="spec-strip__item">
+              <span>알 크기</span>
+              <strong>{filters.kibbleMax}mm 이하</strong>
+            </div>
+            <div className="spec-strip__item">
+              <span>kg당 가격</span>
+              <strong className="is-price">
+                {formatWon(filters.priceMaxPerKg)} 이하
+              </strong>
+            </div>
+            <div className="spec-strip__item">
+              <span>현재 매칭</span>
+              <strong className="is-count">{ranked.length}개</strong>
+            </div>
           </div>
         </div>
       </section>
 
-      <main className="main">
-        <aside className={`panel${filtersOpen ? ' is-open' : ''}`}>
-          <div className="panel__head">
+      <main className="workspace">
+        <aside className={`filter-rail${filtersOpen ? ' is-open' : ''}`}>
+          <div className="filter-rail__head">
             <div>
-              <h2>세부 조건</h2>
-              <p>기본값을 바탕으로 원하는 만큼만 조정하세요</p>
+              <h2>상세 조건</h2>
+              <p>옵션 바꾸면 오른쪽 순위가 즉시 갱신</p>
             </div>
             <button
               type="button"
-              className="panel__toggle"
+              className="filter-rail__toggle"
               onClick={() => setFiltersOpen((v) => !v)}
               aria-expanded={filtersOpen}
             >
@@ -146,7 +210,7 @@ export default function App() {
             </button>
           </div>
 
-          <div className="panel__body">
+          <div className="filter-rail__body">
             <RangeField
               label="고기 함량 최소"
               value={filters.meatMin}
@@ -179,7 +243,7 @@ export default function App() {
               label="채소"
               value={filters.vegetables}
               options={[
-                { value: 'any', label: '상관없음' },
+                { value: 'any', label: '전체' },
                 { value: 'yes', label: '포함' },
                 { value: 'no', label: '없음' },
               ]}
@@ -205,91 +269,102 @@ export default function App() {
                   patchFilters({ prioritizePalatability })
                 }
               >
-                기호성 우선
+                기호성↑
               </ToggleChip>
               <ToggleChip
                 checked={filters.prioritizeDiet}
                 onChange={(prioritizeDiet) => patchFilters({ prioritizeDiet })}
               >
-                다이어트 우선
+                다이어트
               </ToggleChip>
             </div>
           </div>
         </aside>
 
-        <section className="results" aria-live="polite">
-          <div className="results__head">
-            <h2>
-              {filters.species === 'dog' ? '강아지' : '고양이'} 사료 순위
-            </h2>
-            <p>
-              조건에 맞는 <strong>{ranked.length}</strong>개 · 값을 바꾸면 순위가
-              다시 정렬됩니다
-            </p>
+        <section className="plp" id="results" aria-live="polite">
+          <div className="plp__toolbar">
+            <div>
+              <h2>
+                {speciesLabel} 사료 비교 결과
+                <span>{ranked.length}개</span>
+              </h2>
+              <p>조건 적합 점수 순 · 스펙 변경 시 즉시 재정렬</p>
+            </div>
+          </div>
+
+          <div className="plp__cols" aria-hidden="true">
+            <span>순위 / 상품</span>
+            <span>고기</span>
+            <span>알</span>
+            <span>kg당</span>
+            <span>단백</span>
+            <span>적합·구매</span>
           </div>
 
           {ranked.length === 0 ? (
             <div className="empty">
-              <p>조건이 너무 촘촘해요. 고기함량·가격·알 크기 중 하나를 조금 풀어보세요.</p>
+              <p>
+                조건에 맞는 상품이 없습니다. 고기함량·가격·알 크기 중 하나를
+                완화해 보세요.
+              </p>
               <button type="button" onClick={() => applyPreset('standard')}>
-                표준 프리셋으로 돌아가기
+                표준 모드로 초기화
               </button>
             </div>
           ) : (
-            <ol className="rank-list">
+            <ol className="product-list">
               {ranked.map((product, index) => (
-                <li key={product.id} className="rank-item">
-                  <div className="rank-item__order" aria-hidden="true">
-                    {index + 1}
-                  </div>
-                  <div className="rank-item__body">
-                    <div className="rank-item__title">
-                      <h3>
-                        <span>{product.brand}</span> {product.name}
-                      </h3>
-                      <p>{product.summary}</p>
+                <li key={product.id} className="product-row">
+                  <div className="product-row__main">
+                    <div
+                      className={`rank-badge${index < 3 ? ` is-top${index + 1}` : ''}`}
+                    >
+                      {index + 1}
                     </div>
-
-                    <dl className="specs">
-                      <div>
-                        <dt>고기</dt>
-                        <dd>{product.meatPercent}%</dd>
+                    <div className="product-row__info">
+                      <div className="product-row__name">
+                        <span className="brand">{product.brand}</span>
+                        <h3>{product.name}</h3>
                       </div>
-                      <div>
-                        <dt>알 크기</dt>
-                        <dd>{product.kibbleSizeMm}mm</dd>
-                      </div>
-                      <div>
-                        <dt>kg당</dt>
-                        <dd>{formatWon(product.pricePerKg)}</dd>
-                      </div>
-                      <div>
-                        <dt>단백</dt>
-                        <dd>{product.proteinSource}</dd>
-                      </div>
-                    </dl>
-
-                    {product.matchReasons.length > 0 && (
-                      <ul className="reasons">
-                        {product.matchReasons.map((reason) => (
-                          <li key={reason}>{reason}</li>
-                        ))}
-                      </ul>
-                    )}
+                      <p>{product.summary}</p>
+                      {product.matchReasons.length > 0 && (
+                        <ul className="match-tags">
+                          {product.matchReasons.map((reason) => (
+                            <li key={reason}>{reason}</li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="rank-item__actions">
-                    <div className="score" title="조건 적합 점수">
+                  <div className="product-row__spec" data-label="고기">
+                    <em>{product.meatPercent}%</em>
+                  </div>
+                  <div className="product-row__spec" data-label="알">
+                    <em>{product.kibbleSizeMm}mm</em>
+                  </div>
+                  <div
+                    className="product-row__spec is-price"
+                    data-label="kg당"
+                  >
+                    <em>{formatWon(product.pricePerKg)}</em>
+                  </div>
+                  <div className="product-row__spec" data-label="단백">
+                    <em>{product.proteinSource}</em>
+                  </div>
+
+                  <div className="product-row__buy">
+                    <div className="fit-score" title="조건 적합 점수">
                       <span>적합</span>
                       <strong>{Math.round(product.score)}</strong>
                     </div>
                     <a
-                      className="buy"
+                      className="buy-btn"
                       href={product.coupangUrl}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
                     >
-                      쿠팡에서 보기
+                      쿠팡 보기
                     </a>
                   </div>
                 </li>
@@ -299,10 +374,10 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="footer">
+      <footer className="site-footer">
         <p>
-          골라먹 초안 · 샘플 데이터 기준 순위입니다. 쿠팡 링크는 추후
-          파트너스 트래킹 URL로 교체하세요.
+          골라먹 프로토타입 · 샘플 데이터 기준입니다. 쿠팡 링크는 파트너스
+          트래킹 URL로 교체 예정입니다.
         </p>
       </footer>
     </div>
