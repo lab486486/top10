@@ -11,10 +11,8 @@ import {
 } from './data/presets'
 import { rankProducts } from './lib/rank'
 import { RangeField, SegmentedControl, ToggleChip } from './components/ui'
+import heroImage from './assets/hero.jpg'
 import './App.css'
-
-const HERO_IMAGE =
-  'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=1800&q=80'
 
 function detectPreset(filters: Filters): PresetId {
   for (const id of ['standard', 'allergy', 'value'] as const) {
@@ -85,10 +83,10 @@ export default function App() {
       <section className="hero" id="top" aria-label="골라먹 소개">
         <div className="hero__media" aria-hidden="true">
           <img
-            src={HERO_IMAGE}
+            src={heroImage}
             alt=""
             width={1800}
-            height={1200}
+            height={1059}
             fetchPriority="high"
           />
           <div className="hero__veil" />
