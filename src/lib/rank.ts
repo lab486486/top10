@@ -1,9 +1,19 @@
 import type { Product } from '../data/products'
 import type { Filters } from '../data/presets'
+import {
+  composeScore,
+  getScoreBand,
+  metricScores,
+  MODE_WEIGHTS,
+  type ScoreBand,
+  type ScoreMode,
+} from '../data/score'
 
 export type RankedProduct = Product & {
   score: number
+  scoreBand: ScoreBand
   matchReasons: string[]
+  metricBreakdown: ReturnType<typeof metricScores>
 }
 
 function passesHardFilters(product: Product, filters: Filters): boolean {
@@ -18,79 +28,53 @@ function passesHardFilters(product: Product, filters: Filters): boolean {
   return true
 }
 
-function scoreProduct(product: Product, filters: Filters): {
-  score: number
-  matchReasons: string[]
-} {
-  let score = 40
-  const matchReasons: string[] = []
-
-  const meatBonus = Math.min(30, (product.meatPercent - filters.meatMin) * 0.6)
-  score += Math.max(0, meatBonus)
-  if (product.meatPercent >= filters.meatMin + 15) {
-    matchReasons.push(`고기 ${product.meatPercent}%`)
+function buildReasons(product: Product): string[] {
+  const reasons: string[] = []
+  if (product.meatPercent >= 50) reasons.push(`고기 ${product.meatPercent}%`)
+  if (product.proteinPercent >= 28) reasons.push(`단백 ${product.proteinPercent}%`)
+  if (product.pricePerKg <= 12000) {
+    reasons.push(`kg당 ${product.pricePerKg.toLocaleString('ko-KR')}원`)
   }
-
-  const kibbleRoom = filters.kibbleMax - product.kibbleSizeMm
-  score += Math.min(12, Math.max(0, kibbleRoom) * 1.5)
-  if (product.kibbleSizeMm <= 8) {
-    matchReasons.push(`알 ${product.kibbleSizeMm}mm`)
-  }
-
-  const priceRoom =
-    (filters.priceMaxPerKg - product.pricePerKg) / filters.priceMaxPerKg
-  score += Math.min(18, Math.max(0, priceRoom) * 22)
-  if (product.pricePerKg <= 10000) {
-    matchReasons.push(`kg당 ${product.pricePerKg.toLocaleString('ko-KR')}원`)
-  }
-
-  if (filters.grainFree && product.grainFree) {
-    score += 8
-    matchReasons.push('그레인프리')
-  }
-  if (filters.singleProtein && product.singleProtein) {
-    score += 10
-    matchReasons.push(`단일 ${product.proteinSource}`)
-  }
-  if (product.allergyFriendly && (filters.grainFree || filters.singleProtein)) {
-    score += 6
-    matchReasons.push('알러지 케어')
-  }
-
-  if (filters.prioritizePalatability) {
-    score += product.palatability * 6
-    if (product.palatability >= 5) matchReasons.push('기호성 높음')
-  } else {
-    score += product.palatability * 2
-  }
-
-  if (filters.prioritizeDiet) {
-    const dietBonus = Math.max(0, (3800 - product.calorieKcalPerKg) / 40)
-    score += Math.min(20, dietBonus)
-    if (product.calorieKcalPerKg <= 3200) matchReasons.push('저칼로리')
-  }
-
-  if (filters.vegetables === 'yes' && product.hasVegetables) {
-    score += 4
-    matchReasons.push('채소 포함')
-  }
-  if (filters.vegetables === 'no' && !product.hasVegetables) {
-    score += 4
-    matchReasons.push('채소 없음')
-  }
-
-  return { score: Math.round(score * 10) / 10, matchReasons: matchReasons.slice(0, 3) }
+  if (product.grainFree) reasons.push('그레인프리')
+  if (product.singleProtein) reasons.push(`단일 ${product.proteinSource}`)
+  if (product.kibbleSizeMm <= 9) reasons.push(`알 ${product.kibbleSizeMm}mm`)
+  if (product.allergyFriendly) reasons.push('알러지 케어')
+  return reasons.slice(0, 3)
 }
 
 export function rankProducts(
   products: Product[],
   filters: Filters,
+  mode: ScoreMode,
 ): RankedProduct[] {
+  const weights = MODE_WEIGHTS[mode]
+
   return products
     .filter((p) => passesHardFilters(p, filters))
     .map((product) => {
-      const { score, matchReasons } = scoreProduct(product, filters)
-      return { ...product, score, matchReasons }
+      const metricBreakdown = metricScores({
+        meatPercent: product.meatPercent,
+        proteinPercent: product.proteinPercent,
+        pricePerKg: product.pricePerKg,
+        grainFree: product.grainFree,
+        singleProtein: product.singleProtein,
+        allergyFriendly: product.allergyFriendly,
+        kibbleSizeMm: product.kibbleSizeMm,
+        preferSmallKibble: filters.preferSmallKibble,
+      })
+      const score = composeScore(metricBreakdown, weights)
+      return {
+        ...product,
+        score,
+        scoreBand: getScoreBand(score),
+        matchReasons: buildReasons(product),
+        metricBreakdown,
+      }
     })
-    .sort((a, b) => b.score - a.score || a.pricePerKg - b.pricePerKg)
+    .sort((a, b) => {
+      if (mode === 'grade') {
+        if (a.scoreBand.min !== b.scoreBand.min) return b.scoreBand.min - a.scoreBand.min
+      }
+      return b.score - a.score || a.pricePerKg - b.pricePerKg
+    })
 }

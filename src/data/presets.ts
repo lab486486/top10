@@ -1,13 +1,7 @@
 import type { Species } from './products'
+import type { ScoreMode } from './score'
 
 export type VegPreference = 'any' | 'yes' | 'no'
-export type PresetId = 'standard' | 'allergy' | 'value' | 'custom'
-export type ConcernId =
-  | 'allergy'
-  | 'palatability'
-  | 'kibble'
-  | 'diet'
-  | 'value'
 
 export type Filters = {
   species: Species
@@ -17,116 +11,74 @@ export type Filters = {
   grainFree: boolean
   singleProtein: boolean
   priceMaxPerKg: number
-  prioritizePalatability: boolean
-  prioritizeDiet: boolean
+  preferSmallKibble: boolean
 }
 
 export const DEFAULT_FILTERS: Filters = {
   species: 'dog',
-  meatMin: 30,
+  meatMin: 25,
   kibbleMax: 14,
   vegetables: 'any',
   grainFree: false,
   singleProtein: false,
-  priceMaxPerKg: 35000,
-  prioritizePalatability: false,
-  prioritizeDiet: false,
+  priceMaxPerKg: 40000,
+  preferSmallKibble: true,
 }
 
-export const PRESETS: Record<
-  Exclude<PresetId, 'custom'>,
+export const MODES: Record<
+  ScoreMode,
   { label: string; hint: string; filters: Partial<Filters> }
 > = {
-  standard: {
-    label: '표준',
-    hint: '중형·보통 가격·범용',
+  rank: {
+    label: '순위별',
+    hint: '5지표 종합 스코어',
+    filters: {
+      meatMin: 25,
+      kibbleMax: 14,
+      vegetables: 'any',
+      grainFree: false,
+      singleProtein: false,
+      priceMaxPerKg: 40000,
+      preferSmallKibble: true,
+    },
+  },
+  grade: {
+    label: '등급별',
+    hint: '고기·단백 중심 밴드',
     filters: {
       meatMin: 30,
       kibbleMax: 14,
       vegetables: 'any',
       grainFree: false,
       singleProtein: false,
-      priceMaxPerKg: 35000,
-      prioritizePalatability: false,
-      prioritizeDiet: false,
+      priceMaxPerKg: 40000,
+      preferSmallKibble: true,
+    },
+  },
+  value: {
+    label: '가성비',
+    hint: 'kg당 가격 가중',
+    filters: {
+      meatMin: 20,
+      kibbleMax: 14,
+      vegetables: 'any',
+      grainFree: false,
+      singleProtein: false,
+      priceMaxPerKg: 15000,
+      preferSmallKibble: true,
     },
   },
   allergy: {
     label: '알러지',
     hint: '단일단백·그레인프리',
     filters: {
-      meatMin: 35,
+      meatMin: 30,
       kibbleMax: 12,
       vegetables: 'any',
       grainFree: true,
       singleProtein: true,
-      priceMaxPerKg: 35000,
-      prioritizePalatability: false,
-      prioritizeDiet: false,
-    },
-  },
-  value: {
-    label: '가성비',
-    hint: 'kg당 부담 줄이기',
-    filters: {
-      meatMin: 20,
-      kibbleMax: 14,
-      vegetables: 'any',
-      grainFree: false,
-      singleProtein: false,
-      priceMaxPerKg: 12000,
-      prioritizePalatability: false,
-      prioritizeDiet: false,
+      priceMaxPerKg: 40000,
+      preferSmallKibble: true,
     },
   },
 }
-
-export const CONCERNS: {
-  id: ConcernId
-  label: string
-  filters: Partial<Filters>
-  preset?: Exclude<PresetId, 'custom'>
-}[] = [
-  {
-    id: 'allergy',
-    label: '피부알러지',
-    preset: 'allergy',
-    filters: {
-      grainFree: true,
-      singleProtein: true,
-      meatMin: 35,
-    },
-  },
-  {
-    id: 'palatability',
-    label: '잘 안 먹어요',
-    filters: {
-      prioritizePalatability: true,
-      meatMin: 35,
-    },
-  },
-  {
-    id: 'kibble',
-    label: '알이 커요',
-    filters: {
-      kibbleMax: 8,
-    },
-  },
-  {
-    id: 'diet',
-    label: '다이어트',
-    filters: {
-      prioritizeDiet: true,
-      meatMin: 30,
-    },
-  },
-  {
-    id: 'value',
-    label: '가격 부담',
-    preset: 'value',
-    filters: {
-      priceMaxPerKg: 12000,
-      meatMin: 20,
-    },
-  },
-]
