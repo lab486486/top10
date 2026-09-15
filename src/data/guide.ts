@@ -1,5 +1,5 @@
 import type { Filters } from './presets'
-import { DEFAULT_FILTERS, MODES, priceBandFromCenter } from './presets'
+import { DEFAULT_FILTERS, priceBandFromCenter } from './presets'
 import type { Product } from './products'
 import type { ScoreMode } from './score'
 import type { KibbleBand, ProteinId } from './filterOptions'
@@ -83,15 +83,16 @@ function sizeToKibble(size: DogSize): {
 } {
   if (size === 'small') {
     return {
-      kibbleBand: 'small',
+      // 카탈로그에 ~8mm(스몰 밴드)가 거의 없어, 상한만 걸고 가산으로 유도
+      kibbleBand: 'any',
       kibbleMax: 10,
       preferSmallKibble: true,
-      sizeHint: '소형견은 작은 알(~8mm)이 씹기 쉬워요',
+      sizeHint: '소형견은 작은 알(~10mm 이하)이 씹기 쉬워요',
     }
   }
   if (size === 'medium') {
     return {
-      kibbleBand: 'medium',
+      kibbleBand: 'any',
       kibbleMax: 13,
       preferSmallKibble: false,
       sizeHint: '중형견은 9~13mm 알이 무난해요',
@@ -137,11 +138,16 @@ export function guideToRecommendation(answers: GuideAnswers): {
 
   if (answers.concern === 'allergy') {
     mode = 'allergy'
-    Object.assign(filters, MODES.allergy.filters)
+    // 하드 필터를 모드 전부 덮어쓰면 후보가 비기 쉬워, 핵심만 적용
+    filters.grainFree = true
+    filters.singleProtein = true
+    filters.glutenFree = true
+    filters.lid = true
+    filters.meatMin = 45
     explain.push('알러지·피부가 걱정되면 단일단백·그레인프리부터')
   } else if (answers.concern === 'value') {
     mode = 'value'
-    Object.assign(filters, MODES.value.filters)
+    filters.meatMin = 45
     explain.push('같은 예산에서 가성비 스코어를 더 봤어요')
   } else if (answers.concern === 'safe') {
     mode = 'rank'
@@ -159,8 +165,8 @@ export function guideToRecommendation(answers: GuideAnswers): {
     explain.push('닭 대신 생선 단백질 위주로 좁혔어요')
   } else if (answers.protein === 'single') {
     filters.singleProtein = true
-    filters.lid = true
-    explain.push('원인 모를 알러지엔 단일단백(L.I.D)부터')
+    // lid는 보너스로만 — 둘 다 강제하면 후보가 너무 줄어듦
+    explain.push('원인 모를 알러지엔 단일단백부터')
   } else {
     explain.push('단백질을 모르면 스코어·단일단백 여부를 함께 봤어요')
   }
