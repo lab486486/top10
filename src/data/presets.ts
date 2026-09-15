@@ -42,7 +42,7 @@ export function priceBandFromCenter(center: number): {
 
 export const DEFAULT_FILTERS: Filters = {
   species: 'dog',
-  meatMin: 15,
+  meatMin: 60,
   kibbleMax: 16,
   vegetables: 'any',
   grainFree: false,
@@ -59,7 +59,7 @@ export const MODES: Record<
     label: '순위별',
     hint: '5지표 종합 스코어',
     filters: {
-      meatMin: 15,
+      meatMin: 60,
       kibbleMax: 16,
       vegetables: 'any',
       grainFree: false,
@@ -71,7 +71,7 @@ export const MODES: Record<
     label: '등급별',
     hint: '고기·단백 중심 밴드',
     filters: {
-      meatMin: 25,
+      meatMin: 60,
       kibbleMax: 16,
       vegetables: 'any',
       grainFree: false,
@@ -83,7 +83,7 @@ export const MODES: Record<
     label: '가성비',
     hint: 'kg당 가격 가중',
     filters: {
-      meatMin: 15,
+      meatMin: 50,
       kibbleMax: 16,
       vegetables: 'any',
       grainFree: false,
@@ -95,7 +95,7 @@ export const MODES: Record<
     label: '알러지',
     hint: '단일단백·그레인프리',
     filters: {
-      meatMin: 20,
+      meatMin: 50,
       kibbleMax: 12,
       vegetables: 'any',
       grainFree: true,

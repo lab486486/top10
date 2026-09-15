@@ -27,6 +27,10 @@ function formatWon(value: number) {
   return `${value.toLocaleString('ko-KR')}원`
 }
 
+function formatWonNum(value: number) {
+  return value.toLocaleString('ko-KR')
+}
+
 function medalFor(index: number) {
   return { num: String(index + 1), label: `${index + 1}위` }
 }
@@ -128,9 +132,8 @@ export default function App() {
                   <strong className="price-readout">
                     <span className="price-readout__center">{formatWon(draftPrice)}</span>
                     <span className="price-readout__band">
-                      검색 {formatWon(draftBand.priceMinPerKg)}
-                      {' ~ '}
-                      {formatWon(draftBand.priceMaxPerKg)}
+                      검색범위 {formatWonNum(draftBand.priceMinPerKg)}~
+                      {formatWonNum(draftBand.priceMaxPerKg)}원
                     </span>
                   </strong>
                 </div>
@@ -149,8 +152,8 @@ export default function App() {
                 </div>
 
                 <div className="portal-search__ends">
-                  <span>{formatWon(PRICE_SLIDER.min)}</span>
-                  <span>{formatWon(PRICE_SLIDER.max)}</span>
+                  <span>최저 {formatWon(PRICE_SLIDER.min)}</span>
+                  <span>최고 {formatWon(PRICE_SLIDER.max)}</span>
                 </div>
               </div>
 
@@ -218,26 +221,49 @@ export default function App() {
               ))}
             </div>
 
-            <div className="weight-bars weight-bars--emphasis" aria-label="현재 모드 배점">
-              {WEIGHT_LABELS.map(({ key, label, emoji }) => (
-                <div key={key} className={`weight-bar weight-bar--${key}`}>
-                  <div className="weight-bar__meta">
-                    <span>
-                      <span className="weight-bar__emoji" aria-hidden="true">
+            <div className="weight-stack" aria-label="100점 배점 구성">
+              <div className="weight-stack__caption-row">
+                <span>100점 만점 구성</span>
+                <strong>합계 100점</strong>
+              </div>
+              <div
+                className="weight-stack__bar"
+                role="img"
+                aria-label={WEIGHT_LABELS.map(
+                  ({ key, label }) => `${label} ${activeWeights[key]}점`,
+                ).join(', ')}
+              >
+                {WEIGHT_LABELS.map(({ key, label }) => (
+                  <i
+                    key={key}
+                    className={`weight-stack__seg weight-stack__seg--${key}`}
+                    style={{ width: `${activeWeights[key]}%` }}
+                    title={`${label} ${activeWeights[key]}점`}
+                  />
+                ))}
+              </div>
+              <ul className="weight-stack__legend">
+                {WEIGHT_LABELS.map(({ key, label, emoji }) => (
+                  <li
+                    key={key}
+                    className={`weight-stack__item weight-stack__item--${key}`}
+                  >
+                    <span className="weight-stack__label">
+                      <span className="weight-stack__emoji" aria-hidden="true">
                         {emoji}
                       </span>
                       {label}
                     </span>
-                    <strong>
-                      {activeWeights[key]}
-                      <small>점</small>
-                    </strong>
-                  </div>
-                  <div className="weight-bar__track">
-                    <i style={{ width: `${activeWeights[key] * 2}%` }} />
-                  </div>
-                </div>
-              ))}
+                    <span className="weight-stack__points">
+                      <strong>{activeWeights[key]}</strong>
+                      <span>점 / 100점</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="weight-stack__note">
+                각 숫자는 100점 만점 스코어에서 해당 지표가 차지하는 배점입니다.
+              </p>
             </div>
           </div>
         </div>

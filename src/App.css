@@ -474,6 +474,152 @@ button {
   letter-spacing: -0.02em;
 }
 
+.weight-stack {
+  margin-top: 0.35rem;
+}
+
+.weight-stack__caption-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.weight-stack__caption-row strong {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.weight-stack__bar {
+  display: flex;
+  width: 100%;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #eef1f5;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.weight-stack__seg {
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.weight-stack__seg--meat {
+  background: linear-gradient(90deg, #f97066, #d92d20);
+}
+
+.weight-stack__seg--protein {
+  background: linear-gradient(90deg, #fec84b, #f79009);
+}
+
+.weight-stack__seg--value {
+  background: linear-gradient(90deg, #6ce9a6, #12b76a);
+}
+
+.weight-stack__seg--allergy {
+  background: linear-gradient(90deg, #67e8f9, #06b6d4);
+}
+
+.weight-stack__seg--kibble {
+  background: linear-gradient(90deg, #fdba74, #ea580c);
+}
+
+.weight-stack__legend {
+  list-style: none;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.weight-stack__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+  background: #f7f9fc;
+  border: 1px solid var(--line);
+}
+
+.weight-stack__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.weight-stack__emoji {
+  font-size: 0.95rem;
+}
+
+.weight-stack__points {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.weight-stack__points strong {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.weight-stack__item--meat .weight-stack__label,
+.weight-stack__item--meat .weight-stack__points strong {
+  color: #b42318;
+}
+
+.weight-stack__item--protein .weight-stack__label,
+.weight-stack__item--protein .weight-stack__points strong {
+  color: #b54708;
+}
+
+.weight-stack__item--value .weight-stack__label,
+.weight-stack__item--value .weight-stack__points strong {
+  color: #067647;
+}
+
+.weight-stack__item--allergy .weight-stack__label,
+.weight-stack__item--allergy .weight-stack__points strong {
+  color: #0e7490;
+}
+
+.weight-stack__item--kibble .weight-stack__label,
+.weight-stack__item--kibble .weight-stack__points strong {
+  color: #9a3412;
+}
+
+.weight-stack__note {
+  margin: 0.7rem 0 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+@media (max-width: 900px) {
+  .weight-stack__legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .weight-stack__legend {
+    grid-template-columns: 1fr;
+  }
+}
+
 .weight-bars--emphasis {
   gap: 0.7rem;
 }
