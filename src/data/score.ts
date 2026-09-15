@@ -27,16 +27,16 @@ export const MODE_WEIGHTS: Record<ScoreMode, ScoreWeights> = {
 }
 
 export const SCORE_ONE_LINER =
-  '펫푸드 스코어는 고기함량·조단백·kg당 가격·알러지 지표·알 크기 5개로 산출한 100점 비교 점수입니다. 시중 등급표·브랜드 마케팅 표기와는 별개입니다.'
+  '펫푸드 스코어는 고기함량·조단백·kg당 가격·알러지 지표·알 크기 5개로 산출한 100점입니다. 이 점수로 계급도(서열)를 나눕니다.'
 
 export const SCORE_TRUST_LINES = [
   '5개 공개 지표 · 100점 환산',
-  '가중치 공개 · 동일 공식으로 전 제품 재계산',
-  '시중 등급표·광고 문구와 무관한 비교 스코어',
+  '동일 공식으로 전 제품 재계산',
+  '시중 등급표·광고 문구와 무관한 서열',
 ] as const
 
 export const GRADE_CONTROVERSY_NOTE =
-  '시중 “사료 등급표”는 공인 인증이 아니며 마케팅에 쓰이는 경우가 많습니다. 펫푸드는 공개 스펙으로만 점수를 매기고, 브랜드 표기는 참고로만 보여 줍니다.'
+  '인터넷에 도는 “사료 등급표”는 공인 인증이 아닌 경우가 많습니다. 펫푸드 계급도는 공개 스펙으로만 점수를 매기고, 브랜드 표기는 참고로만 보여 줍니다.'
 
 export const WEIGHT_LABELS: {
   key: keyof ScoreWeights
@@ -57,13 +57,13 @@ export type ScoreBand = {
   short: string
 }
 
-/** 내부 밴드 코드는 쓰되, 화면에는 점수 구간으로 포장 */
+/** 내부 밴드 — 화면 계급명은 ladder.ts에서 포장 */
 export const SCORE_BANDS: ScoreBand[] = [
-  { code: 'S', min: 90, label: '스코어 90+', short: '상위' },
-  { code: 'A', min: 80, label: '스코어 80+', short: '상위권' },
-  { code: 'B', min: 70, label: '스코어 70+', short: '중상' },
-  { code: 'C', min: 60, label: '스코어 60+', short: '중위' },
-  { code: 'D', min: 0, label: '스코어 60 미만', short: '보급' },
+  { code: 'S', min: 90, label: '신성', short: 'GOD' },
+  { code: 'A', min: 80, label: '최상', short: 'S' },
+  { code: 'B', min: 70, label: '상급', short: 'A' },
+  { code: 'C', min: 60, label: '실속', short: 'B' },
+  { code: 'D', min: 0, label: '보급', short: 'C' },
 ]
 
 export function getScoreBand(score: number): ScoreBand {
