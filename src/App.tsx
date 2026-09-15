@@ -114,13 +114,9 @@ export default function App() {
             <p className="finder__kicker">
               {speciesLabel} 사료 · 1kg 기준 예산
             </p>
-            <h1>
-              kg당 가격을 고르고,
-              <em> 스코어 TOP {TOP_N}</em>
-            </h1>
+            <h1>가격대만 선택하면 최고등급 사료가 검색됩니다!</h1>
             <p className="finder__desc">
-              1kg 기준 가격 지점을 선택하면 ±{formatWon(PRICE_TOLERANCE)} 범위로
-              검색합니다. 적용하기를 눌러야 결과가 바뀝니다.
+              객관적인 펫푸드 스코어를 기반으로 광고없이 순위별로 정렬됩니다.
             </p>
           </div>
 
@@ -198,10 +194,8 @@ export default function App() {
             </div>
 
             <p className="portal-search__hint">
-              적용 중 {formatWon(appliedBand.priceMinPerKg)}
-              {' ~ '}
-              {formatWon(appliedBand.priceMaxPerKg)} · 매칭 {allRanked.length}개 중
-              스코어 상위 <strong>TOP {ranked.length}</strong>
+              검색 결과 <strong>{allRanked.length}개</strong> 확인! 스크롤을 내려
+              최고의 사료를 확인하세요
               {priceDirty ? ' · 적용하기를 눌러 반영하세요' : ''}
             </p>
           </div>
@@ -225,10 +219,15 @@ export default function App() {
             </div>
 
             <div className="weight-bars weight-bars--emphasis" aria-label="현재 모드 배점">
-              {WEIGHT_LABELS.map(({ key, label }) => (
-                <div key={key} className="weight-bar">
+              {WEIGHT_LABELS.map(({ key, label, emoji }) => (
+                <div key={key} className={`weight-bar weight-bar--${key}`}>
                   <div className="weight-bar__meta">
-                    <span>{label}</span>
+                    <span>
+                      <span className="weight-bar__emoji" aria-hidden="true">
+                        {emoji}
+                      </span>
+                      {label}
+                    </span>
                     <strong>
                       {activeWeights[key]}
                       <small>점</small>

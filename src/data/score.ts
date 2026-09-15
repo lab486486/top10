@@ -38,12 +38,16 @@ export const SCORE_TRUST_LINES = [
 export const GRADE_CONTROVERSY_NOTE =
   '시중 “사료 등급표”는 공인 인증이 아니며 마케팅에 쓰이는 경우가 많습니다. 펫푸드는 공개 스펙으로만 점수를 매기고, 브랜드 표기는 참고로만 보여 줍니다.'
 
-export const WEIGHT_LABELS: { key: keyof ScoreWeights; label: string }[] = [
-  { key: 'meat', label: '고기' },
-  { key: 'protein', label: '단백' },
-  { key: 'value', label: '가성비' },
-  { key: 'allergy', label: '알러지' },
-  { key: 'kibble', label: '알크기' },
+export const WEIGHT_LABELS: {
+  key: keyof ScoreWeights
+  label: string
+  emoji: string
+}[] = [
+  { key: 'meat', label: '고기', emoji: '🍖' },
+  { key: 'protein', label: '단백', emoji: '🥛' },
+  { key: 'value', label: '가성비', emoji: '💰' },
+  { key: 'allergy', label: '알러지', emoji: '🌿' },
+  { key: 'kibble', label: '알크기', emoji: '⚪' },
 ]
 
 export type ScoreBand = {

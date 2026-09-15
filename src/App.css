@@ -647,22 +647,84 @@ button {
 }
 
 .weight-bar__meta strong {
-  color: var(--blue);
   font-variant-numeric: tabular-nums;
+}
+
+.weight-bar__emoji {
+  margin-right: 0.28rem;
 }
 
 .weight-bar__track {
   height: 6px;
   border-radius: 999px;
-  background: #e8eef7;
+  background: #eef1f5;
   overflow: hidden;
 }
 
 .weight-bar__track i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--blue), #4d8fff);
   border-radius: inherit;
+}
+
+.weight-bar--meat .weight-bar__meta {
+  color: #b42318;
+}
+
+.weight-bar--meat .weight-bar__meta strong {
+  color: #b42318;
+}
+
+.weight-bar--meat .weight-bar__track i {
+  background: linear-gradient(90deg, #f97066, #d92d20);
+}
+
+.weight-bar--protein .weight-bar__meta {
+  color: #b54708;
+}
+
+.weight-bar--protein .weight-bar__meta strong {
+  color: #b54708;
+}
+
+.weight-bar--protein .weight-bar__track i {
+  background: linear-gradient(90deg, #fec84b, #f79009);
+}
+
+.weight-bar--value .weight-bar__meta {
+  color: #067647;
+}
+
+.weight-bar--value .weight-bar__meta strong {
+  color: #067647;
+}
+
+.weight-bar--value .weight-bar__track i {
+  background: linear-gradient(90deg, #6ce9a6, #12b76a);
+}
+
+.weight-bar--allergy .weight-bar__meta {
+  color: #0e7490;
+}
+
+.weight-bar--allergy .weight-bar__meta strong {
+  color: #0e7490;
+}
+
+.weight-bar--allergy .weight-bar__track i {
+  background: linear-gradient(90deg, #67e8f9, #06b6d4);
+}
+
+.weight-bar--kibble .weight-bar__meta {
+  color: #9a3412;
+}
+
+.weight-bar--kibble .weight-bar__meta strong {
+  color: #9a3412;
+}
+
+.weight-bar--kibble .weight-bar__track i {
+  background: linear-gradient(90deg, #fdba74, #ea580c);
 }
 
 .method-toggle {
