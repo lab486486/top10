@@ -1,10 +1,13 @@
-import { startTransition, useMemo, useState } from 'react'
+import { startTransition, useEffect, useMemo, useState } from 'react'
 import { products } from './data/products'
 import {
   DEFAULT_FILTERS,
+  DEFAULT_PRICE_CENTER,
   MODES,
   PRICE_SLIDER,
+  PRICE_TOLERANCE,
   TOP_N,
+  priceBandFromCenter,
   type Filters,
   type VegPreference,
 } from './data/presets'
@@ -24,19 +27,6 @@ function formatWon(value: number) {
   return `${value.toLocaleString('ko-KR')}원`
 }
 
-function buildChips(filters: Filters): string[] {
-  const chips = [
-    `kg당 ${formatWon(filters.priceMinPerKg)}~${formatWon(filters.priceMaxPerKg)}`,
-  ]
-  if (filters.grainFree) chips.push('그레인프리')
-  if (filters.singleProtein) chips.push('단일단백')
-  if (filters.meatMin > 15) chips.push(`고기 ${filters.meatMin}%↑`)
-  if (filters.kibbleMax < 16) chips.push(`알 ${filters.kibbleMax}mm↓`)
-  if (filters.vegetables === 'yes') chips.push('채소 포함')
-  if (filters.vegetables === 'no') chips.push('채소 없음')
-  return chips
-}
-
 function medalFor(index: number) {
   return { num: String(index + 1), label: `${index + 1}위` }
 }
@@ -46,21 +36,34 @@ export default function App() {
   const [mode, setMode] = useState<ScoreMode>('rank')
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [methodOpen, setMethodOpen] = useState(false)
+  const [draftPrice, setDraftPrice] = useState(DEFAULT_PRICE_CENTER)
+  const [appliedPrice, setAppliedPrice] = useState(DEFAULT_PRICE_CENTER)
+
+  const draftBand = priceBandFromCenter(draftPrice)
+  const appliedBand = priceBandFromCenter(appliedPrice)
+  const priceDirty = draftPrice !== appliedPrice
 
   const allRanked = useMemo(
     () => rankProducts(products, filters, mode),
     [filters, mode],
   )
   const ranked = useMemo(() => allRanked.slice(0, TOP_N), [allRanked])
-  const chips = buildChips(filters)
   const speciesLabel = filters.species === 'dog' ? '강아지' : '고양이'
   const activeWeights = MODE_WEIGHTS[mode]
 
-  const priceSpanLabel =
-    filters.priceMinPerKg <= PRICE_SLIDER.min &&
-    filters.priceMaxPerKg >= PRICE_SLIDER.max
-      ? '전체 가격대'
-      : `${formatWon(filters.priceMinPerKg)} ~ ${formatWon(filters.priceMaxPerKg)}`
+  useEffect(() => {
+    if (!methodOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMethodOpen(false)
+    }
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [methodOpen])
 
   function patchFilters(patch: Partial<Filters>) {
     startTransition(() => {
@@ -75,22 +78,26 @@ export default function App() {
     })
   }
 
-  function setPriceMin(next: number) {
-    patchFilters({
-      priceMinPerKg: Math.min(next, filters.priceMaxPerKg - PRICE_SLIDER.step),
-    })
+  function applyPrice() {
+    setAppliedPrice(draftPrice)
+    patchFilters(priceBandFromCenter(draftPrice))
   }
 
-  function setPriceMax(next: number) {
+  function resetToDefaultPrice() {
+    setDraftPrice(DEFAULT_PRICE_CENTER)
+    setAppliedPrice(DEFAULT_PRICE_CENTER)
+    applyMode('rank')
     patchFilters({
-      priceMaxPerKg: Math.max(next, filters.priceMinPerKg + PRICE_SLIDER.step),
+      ...priceBandFromCenter(DEFAULT_PRICE_CENTER),
+      grainFree: false,
+      singleProtein: false,
     })
   }
 
   return (
     <div className="page">
       <header className="masthead">
-        <div className="masthead__inner">
+        <div className="masthead__inner masthead__inner--brand-only">
           <a className="logo" href="#top">
             <span className="logo__mark">펫</span>
             <span className="logo__text">
@@ -98,36 +105,6 @@ export default function App() {
               <small>멍냥이 사료비교</small>
             </span>
           </a>
-
-          <div className="search-shell" role="search" aria-label="적용 조건 요약">
-            <span className="search-shell__prefix">{speciesLabel}</span>
-            <div className="search-shell__chips">
-              {chips.map((chip) => (
-                <span key={chip}>{chip}</span>
-              ))}
-            </div>
-            <button
-              type="button"
-              className="search-shell__cta"
-              onClick={() =>
-                document
-                  .getElementById('results')
-                  ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-              }
-            >
-              TOP {ranked.length}
-            </button>
-          </div>
-
-          <SegmentedControl
-            label="반려 종류"
-            value={filters.species}
-            options={[
-              { value: 'dog', label: '강아지' },
-              { value: 'cat', label: '고양이' },
-            ]}
-            onChange={(species) => patchFilters({ species })}
-          />
         </div>
       </header>
 
@@ -135,57 +112,60 @@ export default function App() {
         <div className="finder__inner">
           <div className="finder__intro">
             <p className="finder__kicker">
-              {speciesLabel} 사료 · 예산대 추천
+              {speciesLabel} 사료 · 1kg 기준 예산
             </p>
             <h1>
-              kg당 가격대를 잡고,
+              kg당 가격을 고르고,
               <em> 스코어 TOP {TOP_N}</em>
             </h1>
             <p className="finder__desc">
-              예산을 먼저 고르면 그 안에서 스코어 순으로 추천합니다. 그레인프리·단일단백
-              등은 아래에서 추가로 좁힐 수 있어요.
+              1kg 기준 가격 지점을 선택하면 ±{formatWon(PRICE_TOLERANCE)} 범위로
+              검색합니다. 적용하기를 눌러야 결과가 바뀝니다.
             </p>
           </div>
 
           <div className="portal-search" role="search" aria-label="가격대 찾기">
-            <div className="portal-search__head">
-              <span>kg당 가격대</span>
-              <strong>{priceSpanLabel}</strong>
-            </div>
+            <div className="portal-search__row">
+              <div className="portal-search__main">
+                <div className="portal-search__head">
+                  <span>kg당 가격 (1kg 기준)</span>
+                  <strong className="price-readout">
+                    <span className="price-readout__center">{formatWon(draftPrice)}</span>
+                    <span className="price-readout__band">
+                      검색 {formatWon(draftBand.priceMinPerKg)}
+                      {' ~ '}
+                      {formatWon(draftBand.priceMaxPerKg)}
+                    </span>
+                  </strong>
+                </div>
 
-            <div className="dual-range">
-              <div
-                className="dual-range__track"
-                style={{
-                  ['--min' as string]: `${((filters.priceMinPerKg - PRICE_SLIDER.min) / (PRICE_SLIDER.max - PRICE_SLIDER.min)) * 100}%`,
-                  ['--max' as string]: `${((filters.priceMaxPerKg - PRICE_SLIDER.min) / (PRICE_SLIDER.max - PRICE_SLIDER.min)) * 100}%`,
-                }}
-              />
-              <input
-                type="range"
-                className="dual-range__input"
-                min={PRICE_SLIDER.min}
-                max={PRICE_SLIDER.max}
-                step={PRICE_SLIDER.step}
-                value={filters.priceMinPerKg}
-                aria-label="최소 kg당 가격"
-                onChange={(e) => setPriceMin(Number(e.target.value))}
-              />
-              <input
-                type="range"
-                className="dual-range__input"
-                min={PRICE_SLIDER.min}
-                max={PRICE_SLIDER.max}
-                step={PRICE_SLIDER.step}
-                value={filters.priceMaxPerKg}
-                aria-label="최대 kg당 가격"
-                onChange={(e) => setPriceMax(Number(e.target.value))}
-              />
-            </div>
+                <div className="price-range">
+                  <input
+                    type="range"
+                    className="price-range__input"
+                    min={PRICE_SLIDER.min}
+                    max={PRICE_SLIDER.max}
+                    step={PRICE_SLIDER.step}
+                    value={draftPrice}
+                    aria-label="kg당 기준 가격"
+                    onChange={(e) => setDraftPrice(Number(e.target.value))}
+                  />
+                </div>
 
-            <div className="portal-search__ends">
-              <span>{formatWon(PRICE_SLIDER.min)}</span>
-              <span>{formatWon(PRICE_SLIDER.max)}+</span>
+                <div className="portal-search__ends">
+                  <span>{formatWon(PRICE_SLIDER.min)}</span>
+                  <span>{formatWon(PRICE_SLIDER.max)}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className="price-apply"
+                disabled={!priceDirty}
+                onClick={applyPrice}
+              >
+                적용하기
+              </button>
             </div>
 
             <div className="portal-search__filters">
@@ -218,24 +198,41 @@ export default function App() {
             </div>
 
             <p className="portal-search__hint">
-              조건 매칭 {allRanked.length}개 중 · 스코어 상위{' '}
-              <strong>TOP {ranked.length}</strong>
+              적용 중 {formatWon(appliedBand.priceMinPerKg)}
+              {' ~ '}
+              {formatWon(appliedBand.priceMaxPerKg)} · 매칭 {allRanked.length}개 중
+              스코어 상위 <strong>TOP {ranked.length}</strong>
+              {priceDirty ? ' · 적용하기를 눌러 반영하세요' : ''}
             </p>
           </div>
 
-          <div className="score-panel" aria-label="펫푸드 스코어 안내">
+          <div className="score-panel" aria-label="펫푸드 스코어 배점">
+            <div className="score-panel__title-row">
+              <h2 className="score-panel__title">펫푸드 스코어 배점</h2>
+              <button
+                type="button"
+                className="method-toggle"
+                onClick={() => setMethodOpen(true)}
+              >
+                점수 산정 방식 보기
+              </button>
+            </div>
+
             <div className="score-panel__trust">
               {SCORE_TRUST_LINES.map((line) => (
                 <span key={line}>{line}</span>
               ))}
             </div>
 
-            <div className="weight-bars" aria-label="현재 모드 가중치">
+            <div className="weight-bars weight-bars--emphasis" aria-label="현재 모드 배점">
               {WEIGHT_LABELS.map(({ key, label }) => (
                 <div key={key} className="weight-bar">
                   <div className="weight-bar__meta">
                     <span>{label}</span>
-                    <strong>{activeWeights[key]}</strong>
+                    <strong>
+                      {activeWeights[key]}
+                      <small>점</small>
+                    </strong>
                   </div>
                   <div className="weight-bar__track">
                     <i style={{ width: `${activeWeights[key] * 2}%` }} />
@@ -243,33 +240,6 @@ export default function App() {
                 </div>
               ))}
             </div>
-
-            <button
-              type="button"
-              className="method-toggle"
-              aria-expanded={methodOpen}
-              onClick={() => setMethodOpen((v) => !v)}
-            >
-              {methodOpen ? '산정 방식 접기' : '점수 산정 방식 보기'}
-            </button>
-
-            {methodOpen && (
-              <div className="method-detail">
-                <p>{SCORE_ONE_LINER}</p>
-                <p>{GRADE_CONTROVERSY_NOTE}</p>
-                <ul>
-                  <li>
-                    고기함량·조단백·kg당 가격·알러지 지표·알 크기를 0~100으로
-                    환산
-                  </li>
-                  <li>모드별 가중치로 합산해 100점 스코어 산출</li>
-                  <li>
-                    예산(kg당 가격대) 필터가 먼저 적용되고, 그 안에서 TOP {TOP_N}만
-                    표시합니다
-                  </li>
-                </ul>
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -292,6 +262,16 @@ export default function App() {
           </div>
 
           <div className="filter-rail__body">
+            <SegmentedControl
+              label="반려 종류"
+              value={filters.species}
+              options={[
+                { value: 'dog', label: '강아지' },
+                { value: 'cat', label: '고양이' },
+              ]}
+              onChange={(species) => patchFilters({ species })}
+            />
+
             <RangeField
               label="고기 함량 최소"
               value={filters.meatMin}
@@ -357,7 +337,9 @@ export default function App() {
                 </span>
               </h2>
               <p>
-                {priceSpanLabel} · {MODES[mode].label} 스코어 순
+                {formatWon(appliedBand.priceMinPerKg)}
+                {' ~ '}
+                {formatWon(appliedBand.priceMaxPerKg)} · {MODES[mode].label} 스코어 순
               </p>
             </div>
           </div>
@@ -377,19 +359,8 @@ export default function App() {
                 이 가격대에 맞는 상품이 없습니다. 가격 범위를 넓히거나
                 그레인프리·단일단백을 해제해 보세요.
               </p>
-              <button
-                type="button"
-                onClick={() => {
-                  applyMode('rank')
-                  patchFilters({
-                    priceMinPerKg: PRICE_SLIDER.min,
-                    priceMaxPerKg: PRICE_SLIDER.max,
-                    grainFree: false,
-                    singleProtein: false,
-                  })
-                }}
-              >
-                가격대 전체로 초기화
+              <button type="button" onClick={resetToDefaultPrice}>
+                기본 가격(1만원)으로 초기화
               </button>
             </div>
           ) : (
@@ -490,6 +461,58 @@ export default function App() {
           별개입니다.
         </p>
       </footer>
+
+      {methodOpen && (
+        <div
+          className="modal-root"
+          role="presentation"
+          onClick={() => setMethodOpen(false)}
+        >
+          <div
+            className="modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="score-method-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal__head">
+              <h2 id="score-method-title">점수 산정 방식</h2>
+              <button
+                type="button"
+                className="modal__close"
+                aria-label="닫기"
+                onClick={() => setMethodOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="modal__body">
+              <p>{SCORE_ONE_LINER}</p>
+              <p>{GRADE_CONTROVERSY_NOTE}</p>
+              <ul>
+                <li>
+                  고기함량·조단백·kg당 가격·알러지 지표·알 크기를 0~100으로
+                  환산
+                </li>
+                <li>모드별 가중치로 합산해 100점 스코어 산출</li>
+                <li>
+                  1kg 기준 가격 지점의 ±{formatWon(PRICE_TOLERANCE)} 필터가 먼저
+                  적용되고, 그 안에서 TOP {TOP_N}만 표시합니다
+                </li>
+              </ul>
+            </div>
+            <div className="modal__foot">
+              <button
+                type="button"
+                className="modal__ok"
+                onClick={() => setMethodOpen(false)}
+              >
+                확인
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

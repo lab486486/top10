@@ -15,14 +15,30 @@ export type Filters = {
   preferSmallKibble: boolean
 }
 
+/** 1kg 기준 가격 지점 슬라이더 */
 export const PRICE_SLIDER = {
   min: 5000,
   max: 50000,
   step: 1000,
 } as const
 
-/** 예산 안에서 보여줄 추천 개수 */
+/** 선택한 지점 기준 ± 검색 폭 */
+export const PRICE_TOLERANCE = 3000
+
+/** 기본 선택 지점 (1만원 → 7천~1만3천 검색) */
+export const DEFAULT_PRICE_CENTER = 10000
+
 export const TOP_N = 5
+
+export function priceBandFromCenter(center: number): {
+  priceMinPerKg: number
+  priceMaxPerKg: number
+} {
+  return {
+    priceMinPerKg: Math.max(0, center - PRICE_TOLERANCE),
+    priceMaxPerKg: center + PRICE_TOLERANCE,
+  }
+}
 
 export const DEFAULT_FILTERS: Filters = {
   species: 'dog',
@@ -31,8 +47,7 @@ export const DEFAULT_FILTERS: Filters = {
   vegetables: 'any',
   grainFree: false,
   singleProtein: false,
-  priceMinPerKg: 5000,
-  priceMaxPerKg: 25000,
+  ...priceBandFromCenter(DEFAULT_PRICE_CENTER),
   preferSmallKibble: true,
 }
 
