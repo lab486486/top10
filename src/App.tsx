@@ -1,7 +1,6 @@
 import { startTransition, useEffect, useMemo, useState } from 'react'
 import { products } from './data/products'
 import {
-  DEFAULT_FILTERS,
   DEFAULT_PRICE_CENTER,
   MODES,
   PRICE_SLIDER,
@@ -17,6 +16,18 @@ import {
   PROTEIN_OPTIONS,
   type ProteinId,
 } from './data/filterOptions'
+import {
+  CONCERN_OPTIONS,
+  PROTEIN_PICK_OPTIONS,
+  SIZE_OPTIONS,
+  brandRoleLabel,
+  buildGuideReasons,
+  guideToRecommendation,
+  type Concern,
+  type DogSize,
+  type GuideAnswers,
+  type ProteinPick,
+} from './data/guide'
 import {
   GRADE_CONTROVERSY_NOTE,
   MODE_WEIGHTS,
@@ -41,17 +52,26 @@ function medalFor(index: number) {
   return { num: String(index + 1), label: `${index + 1}위` }
 }
 
+const INITIAL_GUIDE: GuideAnswers = {
+  priceCenter: DEFAULT_PRICE_CENTER,
+  size: 'small',
+  concern: 'unsure',
+  protein: 'unsure',
+}
+
 export default function App() {
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
-  const [mode, setMode] = useState<ScoreMode>('rank')
-  const [filtersOpen, setFiltersOpen] = useState(true)
+  const initial = guideToRecommendation(INITIAL_GUIDE)
+  const [guide, setGuide] = useState<GuideAnswers>(INITIAL_GUIDE)
+  const [filters, setFilters] = useState<Filters>(initial.filters)
+  const [mode, setMode] = useState<ScoreMode>(initial.mode)
+  const [guideExplain, setGuideExplain] = useState(initial.explain)
+  const [guidedOnce, setGuidedOnce] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
   const [methodOpen, setMethodOpen] = useState(false)
   const [draftPrice, setDraftPrice] = useState(DEFAULT_PRICE_CENTER)
-  const [appliedPrice, setAppliedPrice] = useState(DEFAULT_PRICE_CENTER)
 
   const draftBand = priceBandFromCenter(draftPrice)
-  const appliedBand = priceBandFromCenter(appliedPrice)
-  const priceDirty = draftPrice !== appliedPrice
+  const appliedBand = priceBandFromCenter(guide.priceCenter)
 
   const allRanked = useMemo(
     () => rankProducts(products, filters, mode),
@@ -92,23 +112,42 @@ export default function App() {
   function applyMode(next: ScoreMode) {
     setMode(next)
     startTransition(() => {
-      setFilters((prev) => ({ ...prev, ...MODES[next].filters }))
+      setFilters((prev) => ({
+        ...prev,
+        ...MODES[next].filters,
+        ...priceBandFromCenter(guide.priceCenter),
+      }))
     })
   }
 
-  function applyPrice() {
-    setAppliedPrice(draftPrice)
-    patchFilters(priceBandFromCenter(draftPrice))
+  function patchGuide<K extends keyof GuideAnswers>(key: K, value: GuideAnswers[K]) {
+    setGuide((prev) => ({ ...prev, [key]: value }))
   }
 
-  function resetToDefaultPrice() {
+  function runGuide() {
+    const answers: GuideAnswers = { ...guide, priceCenter: draftPrice }
+    const result = guideToRecommendation(answers)
+    setGuide(answers)
+    setMode(result.mode)
+    setGuideExplain(result.explain)
+    setGuidedOnce(true)
+    startTransition(() => {
+      setFilters(result.filters)
+    })
+    requestAnimationFrame(() => {
+      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
+  function resetGuide() {
+    setGuide(INITIAL_GUIDE)
     setDraftPrice(DEFAULT_PRICE_CENTER)
-    setAppliedPrice(DEFAULT_PRICE_CENTER)
-    applyMode('rank')
-    patchFilters({
-      ...priceBandFromCenter(DEFAULT_PRICE_CENTER),
-      grainFree: false,
-      singleProtein: false,
+    const result = guideToRecommendation(INITIAL_GUIDE)
+    setMode(result.mode)
+    setGuideExplain(result.explain)
+    setGuidedOnce(false)
+    startTransition(() => {
+      setFilters(result.filters)
     })
   }
 
@@ -129,29 +168,38 @@ export default function App() {
       <section className="finder" id="top">
         <div className="finder__inner">
           <div className="finder__intro">
-            <p className="finder__kicker">
-              {speciesLabel} 사료 · 1kg 기준 예산
-            </p>
-            <h1>가격대만 선택하면 최고등급 사료가 검색됩니다!</h1>
+            <p className="finder__kicker">4문항으로 맞는 사료 TOP {TOP_N}</p>
+            <h1>
+              브랜드 몰라도 괜찮아요.
+              <br />
+              예산·체형·걱정만 답하면 골라드릴게요
+            </h1>
             <p className="finder__desc">
-              객관적인 펫푸드 스코어를 기반으로 광고없이 순위별로 정렬됩니다.
+              싼 것만 고르다 실패하기 쉬운 분들을 위해, 광고 없이 스코어로 TOP{' '}
+              {TOP_N}만 보여줍니다.
             </p>
           </div>
 
-          <div className="portal-search" role="search" aria-label="가격대 찾기">
-            <div className="portal-search__row">
-              <div className="portal-search__main">
+          <div className="guide-quiz" aria-label="사료 추천 가이드">
+            <div className="guide-step">
+              <div className="guide-step__label">
+                <span className="guide-step__num">1</span>
+                <div>
+                  <strong>예산은 얼마인가요?</strong>
+                  <p>1kg 기준 · 선택 가격 ±{formatWon(PRICE_TOLERANCE)} 범위</p>
+                </div>
+              </div>
+              <div className="guide-step__body">
                 <div className="portal-search__head">
-                  <span>kg당 가격 (1kg 기준)</span>
+                  <span>kg당 가격</span>
                   <strong className="price-readout">
                     <span className="price-readout__center">{formatWon(draftPrice)}</span>
                     <span className="price-readout__band">
-                      검색범위 {formatWonNum(draftBand.priceMinPerKg)}~
+                      검색 {formatWonNum(draftBand.priceMinPerKg)}~
                       {formatWonNum(draftBand.priceMaxPerKg)}원
                     </span>
                   </strong>
                 </div>
-
                 <div className="price-range">
                   <input
                     type="range"
@@ -164,58 +212,110 @@ export default function App() {
                     onChange={(e) => setDraftPrice(Number(e.target.value))}
                   />
                 </div>
-
                 <div className="portal-search__ends">
                   <span>최저 {formatWon(PRICE_SLIDER.min)}</span>
                   <span>최고 {formatWon(PRICE_SLIDER.max)}</span>
                 </div>
               </div>
-
-              <button
-                type="button"
-                className="price-apply"
-                disabled={!priceDirty}
-                onClick={applyPrice}
-              >
-                적용하기
-              </button>
             </div>
 
-            <div className="portal-search__filters">
-              <span className="portal-search__filters-label">추가 조건</span>
-              <div className="toggle-row" role="group" aria-label="추가 조건">
-                <ToggleChip
-                  checked={filters.grainFree}
-                  onChange={(grainFree) => patchFilters({ grainFree })}
-                >
-                  그레인프리
-                </ToggleChip>
-                <ToggleChip
-                  checked={filters.singleProtein}
-                  onChange={(singleProtein) => patchFilters({ singleProtein })}
-                >
-                  단일단백
-                </ToggleChip>
-                {(Object.keys(MODES) as ScoreMode[]).map((id) => (
+            <div className="guide-step">
+              <div className="guide-step__label">
+                <span className="guide-step__num">2</span>
+                <div>
+                  <strong>체형은?</strong>
+                  <p>알 크기를 자동으로 맞춰요</p>
+                </div>
+              </div>
+              <div className="guide-cards" role="radiogroup" aria-label="체형">
+                {SIZE_OPTIONS.map((opt) => (
                   <button
-                    key={id}
+                    key={opt.value}
                     type="button"
-                    className={`toggle-chip${mode === id ? ' is-on' : ''}`}
-                    aria-pressed={mode === id}
-                    onClick={() => applyMode(id)}
+                    role="radio"
+                    aria-checked={guide.size === opt.value}
+                    className={`guide-card${guide.size === opt.value ? ' is-on' : ''}`}
+                    onClick={() => patchGuide('size', opt.value as DogSize)}
                   >
-                    {MODES[id].label}
+                    <strong>{opt.label}</strong>
+                    <span>{opt.hint}</span>
                   </button>
                 ))}
               </div>
             </div>
 
-            <p className="portal-search__hint">
-              검색 결과 <strong>{allRanked.length}개</strong> 확인! 스크롤을 내려
-              최고의 사료를 확인하세요
-              {priceDirty ? ' · 적용하기를 눌러 반영하세요' : ''}
-            </p>
+            <div className="guide-step">
+              <div className="guide-step__label">
+                <span className="guide-step__num">3</span>
+                <div>
+                  <strong>제일 걱정되는 건?</strong>
+                  <p>하나만 골라주세요</p>
+                </div>
+              </div>
+              <div className="guide-cards" role="radiogroup" aria-label="걱정거리">
+                {CONCERN_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={guide.concern === opt.value}
+                    className={`guide-card${guide.concern === opt.value ? ' is-on' : ''}`}
+                    onClick={() => patchGuide('concern', opt.value as Concern)}
+                  >
+                    <strong>{opt.label}</strong>
+                    <span>{opt.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="guide-step">
+              <div className="guide-step__label">
+                <span className="guide-step__num">4</span>
+                <div>
+                  <strong>단백질은?</strong>
+                  <p>모르겠으면 그대로 두셔도 돼요</p>
+                </div>
+              </div>
+              <div className="guide-cards" role="radiogroup" aria-label="단백질">
+                {PROTEIN_PICK_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={guide.protein === opt.value}
+                    className={`guide-card${guide.protein === opt.value ? ' is-on' : ''}`}
+                    onClick={() => patchGuide('protein', opt.value as ProteinPick)}
+                  >
+                    <strong>{opt.label}</strong>
+                    <span>{opt.hint}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="guide-quiz__actions">
+              <button type="button" className="guide-submit" onClick={runGuide}>
+                TOP {TOP_N} 추천 받기
+              </button>
+              {guidedOnce && (
+                <button type="button" className="guide-reset" onClick={resetGuide}>
+                  다시 고르기
+                </button>
+              )}
+            </div>
           </div>
+
+          {guidedOnce && guideExplain.length > 0 && (
+            <div className="guide-explain" aria-live="polite">
+              <strong>이렇게 골랐어요</strong>
+              <ul>
+                {guideExplain.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div className="score-panel" aria-label="펫푸드 스코어 배점">
             <div className="score-panel__title-row">
@@ -237,7 +337,7 @@ export default function App() {
 
             <div className="weight-stack" aria-label="100점 배점 구성">
               <div className="weight-stack__caption-row">
-                <span>100점 만점 구성</span>
+                <span>100점 만점 구성 · {MODES[mode].label}</span>
                 <strong>합계 100점</strong>
               </div>
               <div
@@ -287,8 +387,8 @@ export default function App() {
         <aside className={`filter-rail${filtersOpen ? ' is-open' : ''}`}>
           <div className="filter-rail__head">
             <div>
-              <h2>상세 조건</h2>
-              <p>브랜드·연령·단백질·키블·알레르기</p>
+              <h2>세부 조건</h2>
+              <p>필요할 때만 열어 미세 조정</p>
             </div>
             <button
               type="button"
@@ -310,6 +410,23 @@ export default function App() {
               ]}
               onChange={(species) => patchFilters({ species })}
             />
+
+            <div className="filter-group">
+              <div className="filter-group__label">추천 모드</div>
+              <div className="chip-grid" role="group" aria-label="추천 모드">
+                {(Object.keys(MODES) as ScoreMode[]).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`toggle-chip${mode === id ? ' is-on' : ''}`}
+                    aria-pressed={mode === id}
+                    onClick={() => applyMode(id)}
+                  >
+                    {MODES[id].label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="filter-group">
               <div className="filter-group__label">브랜드</div>
@@ -438,7 +555,8 @@ export default function App() {
           <div className="plp__toolbar">
             <div>
               <h2>
-                {speciesLabel} 예산대 TOP {TOP_N}
+                {guidedOnce ? '맞춤 ' : ''}
+                {speciesLabel} TOP {TOP_N}
                 <span>
                   {ranked.length}/{allRanked.length}
                 </span>
@@ -463,17 +581,21 @@ export default function App() {
           {ranked.length === 0 ? (
             <div className="empty">
               <p>
-                이 가격대에 맞는 상품이 없습니다. 가격 범위를 넓히거나
-                그레인프리·단일단백을 해제해 보세요.
+                조건에 맞는 상품이 없습니다. 위의 가이드에서 예산을 넓히거나
+                「잘 모르겠음」으로 다시 추천받아 보세요.
               </p>
-              <button type="button" onClick={resetToDefaultPrice}>
-                기본 가격(1만원)으로 초기화
+              <button type="button" onClick={resetGuide}>
+                가이드 초기화
               </button>
             </div>
           ) : (
             <ol className="product-list">
               {ranked.map((product, index) => {
                 const medal = medalFor(index)
+                const role = brandRoleLabel(product)
+                const whyReasons = guidedOnce
+                  ? buildGuideReasons(product, guide)
+                  : product.matchReasons
                 return (
                   <li key={product.id} className="product-row">
                     <div className="product-row__main">
@@ -489,6 +611,7 @@ export default function App() {
                       <div className="product-row__info">
                         <div className="product-row__name">
                           <span className="brand">{product.brand}</span>
+                          <span className="brand-role">{role}</span>
                           <h3>{product.name}</h3>
                         </div>
                         <div className="grade-track">
@@ -503,17 +626,17 @@ export default function App() {
                         </div>
                         <p>{product.summary}</p>
                         <p className="review-note">{product.reviewNote}</p>
+                        {whyReasons.length > 0 && (
+                          <ul className="match-tags match-tags--reasons">
+                            {whyReasons.map((reason) => (
+                              <li key={reason}>{reason}</li>
+                            ))}
+                          </ul>
+                        )}
                         {product.tags.length > 0 && (
                           <ul className="match-tags">
                             {product.tags.map((tag) => (
                               <li key={tag}>{tag}</li>
-                            ))}
-                          </ul>
-                        )}
-                        {product.matchReasons.length > 0 && (
-                          <ul className="match-tags match-tags--reasons">
-                            {product.matchReasons.map((reason) => (
-                              <li key={reason}>{reason}</li>
                             ))}
                           </ul>
                         )}
