@@ -38,10 +38,7 @@ function buildChips(filters: Filters): string[] {
 }
 
 function medalFor(index: number) {
-  if (index === 0) return { emoji: '🥇', label: '1위' }
-  if (index === 1) return { emoji: '🥈', label: '2위' }
-  if (index === 2) return { emoji: '🥉', label: '3위' }
-  return { emoji: String(index + 1), label: `${index + 1}위` }
+  return { num: String(index + 1), label: `${index + 1}위` }
 }
 
 export default function App() {
@@ -405,15 +402,11 @@ export default function App() {
                       <div
                         className={`rank-badge${index < 3 ? ` is-top${index + 1}` : ''}`}
                         title={medal.label}
+                        aria-label={medal.label}
                       >
-                        {index < 3 ? (
-                          <span className="rank-badge__medal" aria-hidden="true">
-                            {medal.emoji}
-                          </span>
-                        ) : (
-                          <span className="rank-badge__num">{medal.emoji}</span>
-                        )}
-                        <span className="sr-only">{medal.label}</span>
+                        <span className="rank-badge__num" aria-hidden="true">
+                          {medal.num}
+                        </span>
                       </div>
                       <div className="product-row__info">
                         <div className="product-row__name">
