@@ -10,18 +10,29 @@ export type Filters = {
   vegetables: VegPreference
   grainFree: boolean
   singleProtein: boolean
+  priceMinPerKg: number
   priceMaxPerKg: number
   preferSmallKibble: boolean
 }
 
+export const PRICE_SLIDER = {
+  min: 5000,
+  max: 50000,
+  step: 1000,
+} as const
+
+/** 예산 안에서 보여줄 추천 개수 */
+export const TOP_N = 5
+
 export const DEFAULT_FILTERS: Filters = {
   species: 'dog',
-  meatMin: 25,
-  kibbleMax: 14,
+  meatMin: 15,
+  kibbleMax: 16,
   vegetables: 'any',
   grainFree: false,
   singleProtein: false,
-  priceMaxPerKg: 40000,
+  priceMinPerKg: 5000,
+  priceMaxPerKg: 25000,
   preferSmallKibble: true,
 }
 
@@ -33,12 +44,11 @@ export const MODES: Record<
     label: '순위별',
     hint: '5지표 종합 스코어',
     filters: {
-      meatMin: 25,
-      kibbleMax: 14,
+      meatMin: 15,
+      kibbleMax: 16,
       vegetables: 'any',
       grainFree: false,
       singleProtein: false,
-      priceMaxPerKg: 40000,
       preferSmallKibble: true,
     },
   },
@@ -46,12 +56,11 @@ export const MODES: Record<
     label: '등급별',
     hint: '고기·단백 중심 밴드',
     filters: {
-      meatMin: 30,
-      kibbleMax: 14,
+      meatMin: 25,
+      kibbleMax: 16,
       vegetables: 'any',
       grainFree: false,
       singleProtein: false,
-      priceMaxPerKg: 40000,
       preferSmallKibble: true,
     },
   },
@@ -59,12 +68,11 @@ export const MODES: Record<
     label: '가성비',
     hint: 'kg당 가격 가중',
     filters: {
-      meatMin: 20,
-      kibbleMax: 14,
+      meatMin: 15,
+      kibbleMax: 16,
       vegetables: 'any',
       grainFree: false,
       singleProtein: false,
-      priceMaxPerKg: 15000,
       preferSmallKibble: true,
     },
   },
@@ -72,12 +80,11 @@ export const MODES: Record<
     label: '알러지',
     hint: '단일단백·그레인프리',
     filters: {
-      meatMin: 30,
+      meatMin: 20,
       kibbleMax: 12,
       vegetables: 'any',
       grainFree: true,
       singleProtein: true,
-      priceMaxPerKg: 40000,
       preferSmallKibble: true,
     },
   },

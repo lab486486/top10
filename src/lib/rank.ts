@@ -20,6 +20,7 @@ function passesHardFilters(product: Product, filters: Filters): boolean {
   if (product.species !== filters.species) return false
   if (product.meatPercent < filters.meatMin) return false
   if (product.kibbleSizeMm > filters.kibbleMax) return false
+  if (product.pricePerKg < filters.priceMinPerKg) return false
   if (product.pricePerKg > filters.priceMaxPerKg) return false
   if (filters.vegetables === 'yes' && !product.hasVegetables) return false
   if (filters.vegetables === 'no' && product.hasVegetables) return false

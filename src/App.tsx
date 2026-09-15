@@ -3,6 +3,8 @@ import { products } from './data/products'
 import {
   DEFAULT_FILTERS,
   MODES,
+  PRICE_SLIDER,
+  TOP_N,
   type Filters,
   type VegPreference,
 } from './data/presets'
@@ -24,14 +26,14 @@ function formatWon(value: number) {
 
 function buildChips(filters: Filters): string[] {
   const chips = [
-    `고기 ${filters.meatMin}%↑`,
-    `알 ${filters.kibbleMax}mm↓`,
-    `kg당 ${formatWon(filters.priceMaxPerKg)}↓`,
+    `kg당 ${formatWon(filters.priceMinPerKg)}~${formatWon(filters.priceMaxPerKg)}`,
   ]
-  if (filters.vegetables === 'yes') chips.push('채소 포함')
-  if (filters.vegetables === 'no') chips.push('채소 없음')
   if (filters.grainFree) chips.push('그레인프리')
   if (filters.singleProtein) chips.push('단일단백')
+  if (filters.meatMin > 15) chips.push(`고기 ${filters.meatMin}%↑`)
+  if (filters.kibbleMax < 16) chips.push(`알 ${filters.kibbleMax}mm↓`)
+  if (filters.vegetables === 'yes') chips.push('채소 포함')
+  if (filters.vegetables === 'no') chips.push('채소 없음')
   return chips
 }
 
@@ -48,13 +50,20 @@ export default function App() {
   const [filtersOpen, setFiltersOpen] = useState(true)
   const [methodOpen, setMethodOpen] = useState(false)
 
-  const ranked = useMemo(
+  const allRanked = useMemo(
     () => rankProducts(products, filters, mode),
     [filters, mode],
   )
+  const ranked = useMemo(() => allRanked.slice(0, TOP_N), [allRanked])
   const chips = buildChips(filters)
   const speciesLabel = filters.species === 'dog' ? '강아지' : '고양이'
   const activeWeights = MODE_WEIGHTS[mode]
+
+  const priceSpanLabel =
+    filters.priceMinPerKg <= PRICE_SLIDER.min &&
+    filters.priceMaxPerKg >= PRICE_SLIDER.max
+      ? '전체 가격대'
+      : `${formatWon(filters.priceMinPerKg)} ~ ${formatWon(filters.priceMaxPerKg)}`
 
   function patchFilters(patch: Partial<Filters>) {
     startTransition(() => {
@@ -69,6 +78,18 @@ export default function App() {
     })
   }
 
+  function setPriceMin(next: number) {
+    patchFilters({
+      priceMinPerKg: Math.min(next, filters.priceMaxPerKg - PRICE_SLIDER.step),
+    })
+  }
+
+  function setPriceMax(next: number) {
+    patchFilters({
+      priceMaxPerKg: Math.max(next, filters.priceMinPerKg + PRICE_SLIDER.step),
+    })
+  }
+
   return (
     <div className="page">
       <header className="masthead">
@@ -77,7 +98,7 @@ export default function App() {
             <span className="logo__mark">골</span>
             <span className="logo__text">
               골라먹
-              <small>사료 순위·등급 비교</small>
+              <small>예산 먼저, 스코어로 TOP{TOP_N}</small>
             </span>
           </a>
 
@@ -97,7 +118,7 @@ export default function App() {
                   ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
               }
             >
-              결과 {ranked.length}
+              TOP {ranked.length}
             </button>
           </div>
 
@@ -117,14 +138,92 @@ export default function App() {
         <div className="finder__inner">
           <div className="finder__intro">
             <p className="finder__kicker">
-              {speciesLabel} 사료순위 · 사료등급 비교
+              {speciesLabel} 사료 · 예산대 추천
             </p>
             <h1>
-              {speciesLabel} 사료,
-              <em> 공개 스코어로 순위와 등급을 비교</em>
+              kg당 가격대를 잡고,
+              <em> 골라먹 스코어 TOP {TOP_N}</em>
             </h1>
-            <p className="finder__desc">{SCORE_ONE_LINER}</p>
-            <p className="finder__note">{GRADE_CONTROVERSY_NOTE}</p>
+            <p className="finder__desc">
+              예산을 먼저 고르면 그 안에서 스코어 순으로 추천합니다. 그레인프리·단일단백
+              등은 아래에서 추가로 좁힐 수 있어요.
+            </p>
+          </div>
+
+          <div className="portal-search" role="search" aria-label="가격대 찾기">
+            <div className="portal-search__head">
+              <span>kg당 가격대</span>
+              <strong>{priceSpanLabel}</strong>
+            </div>
+
+            <div className="dual-range">
+              <div
+                className="dual-range__track"
+                style={{
+                  ['--min' as string]: `${((filters.priceMinPerKg - PRICE_SLIDER.min) / (PRICE_SLIDER.max - PRICE_SLIDER.min)) * 100}%`,
+                  ['--max' as string]: `${((filters.priceMaxPerKg - PRICE_SLIDER.min) / (PRICE_SLIDER.max - PRICE_SLIDER.min)) * 100}%`,
+                }}
+              />
+              <input
+                type="range"
+                className="dual-range__input"
+                min={PRICE_SLIDER.min}
+                max={PRICE_SLIDER.max}
+                step={PRICE_SLIDER.step}
+                value={filters.priceMinPerKg}
+                aria-label="최소 kg당 가격"
+                onChange={(e) => setPriceMin(Number(e.target.value))}
+              />
+              <input
+                type="range"
+                className="dual-range__input"
+                min={PRICE_SLIDER.min}
+                max={PRICE_SLIDER.max}
+                step={PRICE_SLIDER.step}
+                value={filters.priceMaxPerKg}
+                aria-label="최대 kg당 가격"
+                onChange={(e) => setPriceMax(Number(e.target.value))}
+              />
+            </div>
+
+            <div className="portal-search__ends">
+              <span>{formatWon(PRICE_SLIDER.min)}</span>
+              <span>{formatWon(PRICE_SLIDER.max)}+</span>
+            </div>
+
+            <div className="portal-search__filters">
+              <span className="portal-search__filters-label">추가 조건</span>
+              <div className="toggle-row" role="group" aria-label="추가 조건">
+                <ToggleChip
+                  checked={filters.grainFree}
+                  onChange={(grainFree) => patchFilters({ grainFree })}
+                >
+                  그레인프리
+                </ToggleChip>
+                <ToggleChip
+                  checked={filters.singleProtein}
+                  onChange={(singleProtein) => patchFilters({ singleProtein })}
+                >
+                  단일단백
+                </ToggleChip>
+                {(Object.keys(MODES) as ScoreMode[]).map((id) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`toggle-chip${mode === id ? ' is-on' : ''}`}
+                    aria-pressed={mode === id}
+                    onClick={() => applyMode(id)}
+                  >
+                    {MODES[id].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <p className="portal-search__hint">
+              조건 매칭 {allRanked.length}개 중 · 골라먹 스코어 상위{' '}
+              <strong>TOP {ranked.length}</strong>
+            </p>
           </div>
 
           <div className="score-panel" aria-label="골라먹 스코어 안내">
@@ -159,10 +258,8 @@ export default function App() {
 
             {methodOpen && (
               <div className="method-detail">
-                <p>
-                  모든 제품에 같은 공식을 적용합니다. 브랜드가 ‘프리미엄’이라
-                  표기해도, 골라먹 스코어는 공개 지표만으로 다시 계산합니다.
-                </p>
+                <p>{SCORE_ONE_LINER}</p>
+                <p>{GRADE_CONTROVERSY_NOTE}</p>
                 <ul>
                   <li>
                     고기함량·조단백·kg당 가격·알러지 지표·알 크기를 0~100으로
@@ -170,51 +267,12 @@ export default function App() {
                   </li>
                   <li>모드별 가중치로 합산해 100점 스코어 산출</li>
                   <li>
-                    스코어 구간(90+/80+/70+/60+/60미만)은 비교용 밴드이며 공인
-                    등급이 아닙니다
+                    예산(kg당 가격대) 필터가 먼저 적용되고, 그 안에서 TOP {TOP_N}만
+                    표시합니다
                   </li>
-                  <li>브랜드 표기 등급은 참고용으로만 별도 표시합니다</li>
                 </ul>
               </div>
             )}
-          </div>
-
-          <div className="mode-board">
-            <div className="mode-board__label">빠른 모드</div>
-            <div className="mode-tabs" role="group" aria-label="점수 모드">
-              {(Object.keys(MODES) as ScoreMode[]).map((id) => (
-                <button
-                  key={id}
-                  type="button"
-                  className={`mode-tab${mode === id ? ' is-active' : ''}`}
-                  onClick={() => applyMode(id)}
-                >
-                  <strong>{MODES[id].label}</strong>
-                  <span>{MODES[id].hint}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="spec-strip" aria-label="핵심 조건">
-            <div className="spec-strip__item">
-              <span>고기함량</span>
-              <strong>{filters.meatMin}% 이상</strong>
-            </div>
-            <div className="spec-strip__item">
-              <span>알 크기</span>
-              <strong>{filters.kibbleMax}mm 이하</strong>
-            </div>
-            <div className="spec-strip__item">
-              <span>kg당 가격</span>
-              <strong className="is-price">
-                {formatWon(filters.priceMaxPerKg)} 이하
-              </strong>
-            </div>
-            <div className="spec-strip__item">
-              <span>현재 매칭</span>
-              <strong className="is-count">{ranked.length}개</strong>
-            </div>
           </div>
         </div>
       </section>
@@ -224,7 +282,7 @@ export default function App() {
           <div className="filter-rail__head">
             <div>
               <h2>상세 조건</h2>
-              <p>바꾸면 스코어·순위가 즉시 갱신</p>
+              <p>고기·알·채소 등 세부 필터</p>
             </div>
             <button
               type="button"
@@ -254,15 +312,6 @@ export default function App() {
               step={1}
               suffix="mm"
               onChange={(kibbleMax) => patchFilters({ kibbleMax })}
-            />
-            <RangeField
-              label="kg당 가격 상한"
-              value={filters.priceMaxPerKg}
-              min={3000}
-              max={40000}
-              step={500}
-              formatValue={(v) => formatWon(v)}
-              onChange={(priceMaxPerKg) => patchFilters({ priceMaxPerKg })}
             />
 
             <SegmentedControl<VegPreference>
@@ -305,11 +354,13 @@ export default function App() {
           <div className="plp__toolbar">
             <div>
               <h2>
-                {speciesLabel} 사료 {MODES[mode].label} 결과
-                <span>{ranked.length}개</span>
+                {speciesLabel} 예산대 TOP {TOP_N}
+                <span>
+                  {ranked.length}/{allRanked.length}
+                </span>
               </h2>
               <p>
-                골라먹 스코어 순 · 브랜드 표기 등급은 참고용으로만 표시합니다
+                {priceSpanLabel} · {MODES[mode].label} 스코어 순
               </p>
             </div>
           </div>
@@ -326,11 +377,22 @@ export default function App() {
           {ranked.length === 0 ? (
             <div className="empty">
               <p>
-                조건에 맞는 상품이 없습니다. 고기함량·가격·알 크기 중 하나를
-                완화해 보세요.
+                이 가격대에 맞는 상품이 없습니다. 가격 범위를 넓히거나
+                그레인프리·단일단백을 해제해 보세요.
               </p>
-              <button type="button" onClick={() => applyMode('rank')}>
-                순위별 모드로 초기화
+              <button
+                type="button"
+                onClick={() => {
+                  applyMode('rank')
+                  patchFilters({
+                    priceMinPerKg: PRICE_SLIDER.min,
+                    priceMaxPerKg: PRICE_SLIDER.max,
+                    grainFree: false,
+                    singleProtein: false,
+                  })
+                }}
+              >
+                가격대 전체로 초기화
               </button>
             </div>
           ) : (
@@ -349,7 +411,7 @@ export default function App() {
                             {medal.emoji}
                           </span>
                         ) : (
-                          medal.emoji
+                          <span className="rank-badge__num">{medal.emoji}</span>
                         )}
                         <span className="sr-only">{medal.label}</span>
                       </div>
