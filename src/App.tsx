@@ -7,6 +7,7 @@ import {
   type VegPreference,
 } from './data/presets'
 import {
+  GRADE_CONTROVERSY_NOTE,
   MODE_WEIGHTS,
   SCORE_ONE_LINER,
   SCORE_TRUST_LINES,
@@ -123,6 +124,7 @@ export default function App() {
               <em> 공개 스코어로 순위와 등급을 비교</em>
             </h1>
             <p className="finder__desc">{SCORE_ONE_LINER}</p>
+            <p className="finder__note">{GRADE_CONTROVERSY_NOTE}</p>
           </div>
 
           <div className="score-panel" aria-label="골라먹 스코어 안내">
@@ -367,8 +369,16 @@ export default function App() {
                           </span>
                         </div>
                         <p>{product.summary}</p>
-                        {product.matchReasons.length > 0 && (
+                        <p className="review-note">{product.reviewNote}</p>
+                        {product.tags.length > 0 && (
                           <ul className="match-tags">
+                            {product.tags.map((tag) => (
+                              <li key={tag}>{tag}</li>
+                            ))}
+                          </ul>
+                        )}
+                        {product.matchReasons.length > 0 && (
+                          <ul className="match-tags match-tags--reasons">
                             {product.matchReasons.map((reason) => (
                               <li key={reason}>{reason}</li>
                             ))}

@@ -206,6 +206,30 @@ button {
   line-height: 1.55;
 }
 
+.finder__note {
+  margin: 0.55rem 0 0;
+  max-width: 48rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #f0e0b8;
+  background: #fff9eb;
+  color: #6a5520;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.review-note {
+  margin: 0.35rem 0 0;
+  color: #4a5563;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.match-tags--reasons li {
+  background: #eef5ff;
+  color: #1f4f9c;
+}
+
 .score-panel {
   margin-top: 1rem;
   padding: 0.95rem 1rem;

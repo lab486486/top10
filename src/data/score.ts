@@ -27,13 +27,16 @@ export const MODE_WEIGHTS: Record<ScoreMode, ScoreWeights> = {
 }
 
 export const SCORE_ONE_LINER =
-  '골라먹 스코어는 고기함량·조단백·kg당 가격·알러지 지표·알 크기 5개로 산출한 100점 비교 점수입니다.'
+  '골라먹 스코어는 고기함량·조단백·kg당 가격·알러지 지표·알 크기 5개로 산출한 100점 비교 점수입니다. 시중 등급표·브랜드 마케팅 표기와는 별개입니다.'
 
 export const SCORE_TRUST_LINES = [
   '5개 공개 지표 · 100점 환산',
   '가중치 공개 · 동일 공식으로 전 제품 재계산',
-  '브랜드 광고 문구와 무관한 비교 스코어',
+  '시중 등급표·광고 문구와 무관한 비교 스코어',
 ] as const
+
+export const GRADE_CONTROVERSY_NOTE =
+  '시중 “사료 등급표”는 공인 인증이 아니며 마케팅에 쓰이는 경우가 많습니다. 골라먹은 공개 스펙으로만 점수를 매기고, 브랜드 표기는 참고로만 보여 줍니다.'
 
 export const WEIGHT_LABELS: { key: keyof ScoreWeights; label: string }[] = [
   { key: 'meat', label: '고기' },
@@ -81,7 +84,13 @@ export function metricScores(input: {
 }) {
   const meat = clamp100(((input.meatPercent - 15) / (90 - 15)) * 100)
 
-  const protein = clamp100(((input.proteinPercent - 18) / (42 - 18)) * 100)
+  // 조단백: 적정 구간(약 24~32%)에서 고득점, 과도하면 감점
+  const p = input.proteinPercent
+  let protein: number
+  if (p < 18) protein = clamp100(((p - 12) / 6) * 55)
+  else if (p <= 32) protein = clamp100(55 + ((p - 18) / 14) * 45)
+  else if (p <= 38) protein = clamp100(100 - ((p - 32) / 6) * 35)
+  else protein = clamp100(65 - ((p - 38) / 8) * 40)
 
   // 저렴할수록 고득점 (3천~4만 구간)
   const value = clamp100(
