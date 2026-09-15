@@ -92,10 +92,10 @@ export default function App() {
       <header className="masthead">
         <div className="masthead__inner">
           <a className="logo" href="#top">
-            <span className="logo__mark">골</span>
+            <span className="logo__mark">펫</span>
             <span className="logo__text">
-              골라먹
-              <small>예산 먼저, 스코어로 TOP{TOP_N}</small>
+              펫푸드
+              <small>멍냥이 사료비교</small>
             </span>
           </a>
 
@@ -139,7 +139,7 @@ export default function App() {
             </p>
             <h1>
               kg당 가격대를 잡고,
-              <em> 골라먹 스코어 TOP {TOP_N}</em>
+              <em> 스코어 TOP {TOP_N}</em>
             </h1>
             <p className="finder__desc">
               예산을 먼저 고르면 그 안에서 스코어 순으로 추천합니다. 그레인프리·단일단백
@@ -218,12 +218,12 @@ export default function App() {
             </div>
 
             <p className="portal-search__hint">
-              조건 매칭 {allRanked.length}개 중 · 골라먹 스코어 상위{' '}
+              조건 매칭 {allRanked.length}개 중 · 스코어 상위{' '}
               <strong>TOP {ranked.length}</strong>
             </p>
           </div>
 
-          <div className="score-panel" aria-label="골라먹 스코어 안내">
+          <div className="score-panel" aria-label="펫푸드 스코어 안내">
             <div className="score-panel__trust">
               {SCORE_TRUST_LINES.map((line) => (
                 <span key={line}>{line}</span>
@@ -419,7 +419,7 @@ export default function App() {
                             <small>(참고)</small>
                           </span>
                           <span className="grade-track__score">
-                            골라먹 {product.scoreBand.label}
+                            펫푸드 {product.scoreBand.label}
                             <small>{product.scoreBand.short}</small>
                           </span>
                         </div>
@@ -485,7 +485,7 @@ export default function App() {
 
       <footer className="site-footer">
         <p>
-          골라먹 스코어는 공개 성분·가격 정보 기반의 참고용 비교 지표이며, 공인
+          펫푸드 스코어는 공개 성분·가격 정보 기반의 참고용 비교 지표이며, 공인
           인증이나 품질 보증이 아닙니다. 브랜드의 프리미엄 등 마케팅 표기와는
           별개입니다.
         </p>

@@ -1,9 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="14" fill="#1F4D3A"/>
-  <ellipse cx="32" cy="38" rx="18" ry="10" fill="#F3EDE3"/>
-  <ellipse cx="32" cy="34" rx="14" ry="7" fill="#E8DFD2"/>
-  <circle cx="24" cy="22" r="4" fill="#F3EDE3"/>
-  <circle cx="40" cy="22" r="4" fill="#F3EDE3"/>
-  <circle cx="18" cy="28" r="3.2" fill="#F3EDE3"/>
-  <circle cx="46" cy="28" r="3.2" fill="#F3EDE3"/>
+  <rect width="64" height="64" rx="14" fill="#06b87f"/>
+  <text
+    x="32"
+    y="42"
+    text-anchor="middle"
+    font-family="Pretendard, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
+    font-size="28"
+    font-weight="800"
+    fill="#ffffff"
+  >펫</text>
 </svg>

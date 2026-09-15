@@ -17,7 +17,7 @@ export type Product = {
   allergyFriendly: boolean
   palatability: number
   calorieKcalPerKg: number
-  /** 브랜드/유통 마케팅 표기(참고). 골라먹 스코어와 별개 */
+  /** 브랜드/유통 마케팅 표기(참고). 펫푸드 스코어와 별개 */
   brandGradeLabel: string
   coupangUrl: string
   summary: string
@@ -30,7 +30,7 @@ export type Product = {
  * 강아지 사료 데이터 (수의사 등급표 논란 리뷰 요약을 바탕으로 한 초안)
  * - 함량·가격은 대표값/공개 정보 추정 → 라벨·쿠팡 실측으로 교체 예정
  * - brandGradeLabel = 마케팅 표기 참고용
- * - 골라먹 스코어는 아래 스펙으로 별도 산출
+ * - 펫푸드 스코어는 아래 스펙으로 별도 산출
  */
 export const products: Product[] = [
   {

@@ -1,4 +1,4 @@
-/** 골라먹 스코어 — 공개 산식 상수 */
+/** 펫푸드 스코어 — 공개 산식 상수 */
 
 export type ScoreMode = 'rank' | 'grade' | 'value' | 'allergy'
 
@@ -27,7 +27,7 @@ export const MODE_WEIGHTS: Record<ScoreMode, ScoreWeights> = {
 }
 
 export const SCORE_ONE_LINER =
-  '골라먹 스코어는 고기함량·조단백·kg당 가격·알러지 지표·알 크기 5개로 산출한 100점 비교 점수입니다. 시중 등급표·브랜드 마케팅 표기와는 별개입니다.'
+  '펫푸드 스코어는 고기함량·조단백·kg당 가격·알러지 지표·알 크기 5개로 산출한 100점 비교 점수입니다. 시중 등급표·브랜드 마케팅 표기와는 별개입니다.'
 
 export const SCORE_TRUST_LINES = [
   '5개 공개 지표 · 100점 환산',
@@ -36,7 +36,7 @@ export const SCORE_TRUST_LINES = [
 ] as const
 
 export const GRADE_CONTROVERSY_NOTE =
-  '시중 “사료 등급표”는 공인 인증이 아니며 마케팅에 쓰이는 경우가 많습니다. 골라먹은 공개 스펙으로만 점수를 매기고, 브랜드 표기는 참고로만 보여 줍니다.'
+  '시중 “사료 등급표”는 공인 인증이 아니며 마케팅에 쓰이는 경우가 많습니다. 펫푸드는 공개 스펙으로만 점수를 매기고, 브랜드 표기는 참고로만 보여 줍니다.'
 
 export const WEIGHT_LABELS: { key: keyof ScoreWeights; label: string }[] = [
   { key: 'meat', label: '고기' },
