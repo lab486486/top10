@@ -1,5 +1,6 @@
 import type { Species } from './products'
 import type { ScoreMode } from './score'
+import type { KibbleBand, LifeStage, ProteinId } from './filterOptions'
 
 export type VegPreference = 'any' | 'yes' | 'no'
 
@@ -13,6 +14,15 @@ export type Filters = {
   priceMinPerKg: number
   priceMaxPerKg: number
   preferSmallKibble: boolean
+  /** empty = all brands */
+  brands: string[]
+  lifeStage: LifeStage | 'any'
+  /** empty = any protein */
+  mainProteins: ProteinId[]
+  kibbleBand: KibbleBand
+  hydrolyzed: boolean
+  glutenFree: boolean
+  lid: boolean
 }
 
 /** 1kg 기준 가격 지점 슬라이더 */
@@ -49,6 +59,13 @@ export const DEFAULT_FILTERS: Filters = {
   singleProtein: false,
   ...priceBandFromCenter(DEFAULT_PRICE_CENTER),
   preferSmallKibble: true,
+  brands: [],
+  lifeStage: 'any',
+  mainProteins: [],
+  kibbleBand: 'any',
+  hydrolyzed: false,
+  glutenFree: false,
+  lid: false,
 }
 
 export const MODES: Record<
@@ -65,6 +82,9 @@ export const MODES: Record<
       grainFree: false,
       singleProtein: false,
       preferSmallKibble: true,
+      hydrolyzed: false,
+      glutenFree: false,
+      lid: false,
     },
   },
   grade: {
@@ -77,6 +97,9 @@ export const MODES: Record<
       grainFree: false,
       singleProtein: false,
       preferSmallKibble: true,
+      hydrolyzed: false,
+      glutenFree: false,
+      lid: false,
     },
   },
   value: {
@@ -89,6 +112,9 @@ export const MODES: Record<
       grainFree: false,
       singleProtein: false,
       preferSmallKibble: true,
+      hydrolyzed: false,
+      glutenFree: false,
+      lid: false,
     },
   },
   allergy: {
@@ -101,6 +127,9 @@ export const MODES: Record<
       grainFree: true,
       singleProtein: true,
       preferSmallKibble: true,
+      hydrolyzed: false,
+      glutenFree: true,
+      lid: true,
     },
   },
 }

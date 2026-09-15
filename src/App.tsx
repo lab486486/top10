@@ -12,6 +12,12 @@ import {
   type VegPreference,
 } from './data/presets'
 import {
+  KIBBLE_BAND_OPTIONS,
+  LIFE_STAGE_OPTIONS,
+  PROTEIN_OPTIONS,
+  type ProteinId,
+} from './data/filterOptions'
+import {
   GRADE_CONTROVERSY_NOTE,
   MODE_WEIGHTS,
   SCORE_ONE_LINER,
@@ -54,6 +60,14 @@ export default function App() {
   const ranked = useMemo(() => allRanked.slice(0, TOP_N), [allRanked])
   const speciesLabel = filters.species === 'dog' ? '강아지' : '고양이'
   const activeWeights = MODE_WEIGHTS[mode]
+  const brandOptions = useMemo(
+    () => [...new Set(products.map((p) => p.brand))].sort((a, b) => a.localeCompare(b, 'ko')),
+    [],
+  )
+
+  function toggleInList<T extends string>(list: T[], value: T): T[] {
+    return list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
+  }
 
   useEffect(() => {
     if (!methodOpen) return
@@ -274,7 +288,7 @@ export default function App() {
           <div className="filter-rail__head">
             <div>
               <h2>상세 조건</h2>
-              <p>고기·알·채소 등 세부 필터</p>
+              <p>브랜드·연령·단백질·키블·알레르기</p>
             </div>
             <button
               type="button"
@@ -297,6 +311,95 @@ export default function App() {
               onChange={(species) => patchFilters({ species })}
             />
 
+            <div className="filter-group">
+              <div className="filter-group__label">브랜드</div>
+              <div className="chip-grid" role="group" aria-label="브랜드">
+                {brandOptions.map((brand) => (
+                  <ToggleChip
+                    key={brand}
+                    checked={filters.brands.includes(brand)}
+                    onChange={() =>
+                      patchFilters({ brands: toggleInList(filters.brands, brand) })
+                    }
+                  >
+                    {brand}
+                  </ToggleChip>
+                ))}
+              </div>
+            </div>
+
+            <SegmentedControl
+              label="연령"
+              value={filters.lifeStage}
+              options={LIFE_STAGE_OPTIONS}
+              onChange={(lifeStage) => patchFilters({ lifeStage })}
+            />
+
+            <div className="filter-group">
+              <div className="filter-group__label">주 단백질원</div>
+              <div className="chip-grid" role="group" aria-label="주 단백질원">
+                {PROTEIN_OPTIONS.map((opt) => (
+                  <ToggleChip
+                    key={opt.value}
+                    checked={filters.mainProteins.includes(opt.value)}
+                    onChange={() =>
+                      patchFilters({
+                        mainProteins: toggleInList(
+                          filters.mainProteins,
+                          opt.value as ProteinId,
+                        ),
+                      })
+                    }
+                  >
+                    {opt.label}
+                  </ToggleChip>
+                ))}
+              </div>
+            </div>
+
+            <SegmentedControl
+              label="키블 크기"
+              value={filters.kibbleBand}
+              options={KIBBLE_BAND_OPTIONS}
+              onChange={(kibbleBand) => patchFilters({ kibbleBand })}
+            />
+
+            <div className="filter-group">
+              <div className="filter-group__label">알레르기 방지</div>
+              <div className="chip-grid" role="group" aria-label="알레르기 방지">
+                <ToggleChip
+                  checked={filters.hydrolyzed}
+                  onChange={(hydrolyzed) => patchFilters({ hydrolyzed })}
+                >
+                  가수분해
+                </ToggleChip>
+                <ToggleChip
+                  checked={filters.grainFree}
+                  onChange={(grainFree) => patchFilters({ grainFree })}
+                >
+                  그레인프리
+                </ToggleChip>
+                <ToggleChip
+                  checked={filters.glutenFree}
+                  onChange={(glutenFree) => patchFilters({ glutenFree })}
+                >
+                  글루텐프리
+                </ToggleChip>
+                <ToggleChip
+                  checked={filters.lid}
+                  onChange={(lid) => patchFilters({ lid })}
+                >
+                  L.I.D
+                </ToggleChip>
+                <ToggleChip
+                  checked={filters.singleProtein}
+                  onChange={(singleProtein) => patchFilters({ singleProtein })}
+                >
+                  단일단백
+                </ToggleChip>
+              </div>
+            </div>
+
             <RangeField
               label="고기 함량 최소"
               value={filters.meatMin}
@@ -305,15 +408,6 @@ export default function App() {
               step={5}
               suffix="%"
               onChange={(meatMin) => patchFilters({ meatMin })}
-            />
-            <RangeField
-              label="알 크기 최대"
-              value={filters.kibbleMax}
-              min={6}
-              max={16}
-              step={1}
-              suffix="mm"
-              onChange={(kibbleMax) => patchFilters({ kibbleMax })}
             />
 
             <SegmentedControl<VegPreference>
@@ -327,19 +421,7 @@ export default function App() {
               onChange={(vegetables) => patchFilters({ vegetables })}
             />
 
-            <div className="toggle-row" role="group" aria-label="추가 조건">
-              <ToggleChip
-                checked={filters.grainFree}
-                onChange={(grainFree) => patchFilters({ grainFree })}
-              >
-                그레인프리
-              </ToggleChip>
-              <ToggleChip
-                checked={filters.singleProtein}
-                onChange={(singleProtein) => patchFilters({ singleProtein })}
-              >
-                단일단백
-              </ToggleChip>
+            <div className="toggle-row" role="group" aria-label="점수 옵션">
               <ToggleChip
                 checked={filters.preferSmallKibble}
                 onChange={(preferSmallKibble) =>

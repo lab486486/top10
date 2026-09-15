@@ -1,5 +1,6 @@
 import type { Product } from '../data/products'
 import type { Filters } from '../data/presets'
+import { matchesKibbleBand } from '../data/filterOptions'
 import {
   composeScore,
   getScoreBand,
@@ -26,6 +27,27 @@ function passesHardFilters(product: Product, filters: Filters): boolean {
   if (filters.vegetables === 'no' && product.hasVegetables) return false
   if (filters.grainFree && !product.grainFree) return false
   if (filters.singleProtein && !product.singleProtein) return false
+  if (filters.brands.length > 0 && !filters.brands.includes(product.brand)) {
+    return false
+  }
+  if (filters.lifeStage !== 'any') {
+    if (
+      product.lifeStage !== filters.lifeStage &&
+      product.lifeStage !== 'allAges'
+    ) {
+      return false
+    }
+  }
+  if (filters.mainProteins.length > 0) {
+    const hit = filters.mainProteins.some((p) =>
+      product.mainProteins.includes(p),
+    )
+    if (!hit) return false
+  }
+  if (!matchesKibbleBand(product.kibbleSizeMm, filters.kibbleBand)) return false
+  if (filters.hydrolyzed && !product.hydrolyzed) return false
+  if (filters.glutenFree && !product.glutenFree) return false
+  if (filters.lid && !product.lid) return false
   return true
 }
 
