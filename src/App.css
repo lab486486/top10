@@ -133,7 +133,7 @@ button {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: min(92vh, 820px);
+  min-height: min(46vh, 410px);
   display: grid;
   align-items: end;
   border-bottom: 2px solid var(--ink);
@@ -160,7 +160,7 @@ button {
 .hero__ladder {
   position: absolute;
   right: clamp(-1rem, -2vw, 0);
-  top: 8%;
+  top: 4%;
   bottom: 8%;
   display: flex;
   flex-direction: column;
@@ -212,7 +212,7 @@ button {
   z-index: 2;
   width: min(1100px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: clamp(4.5rem, 12vh, 7rem) 0 clamp(2.5rem, 6vh, 3.5rem);
+  padding: clamp(0.75rem, 2vh, 1.25rem) 0 clamp(2.5rem, 6vh, 3.5rem);
 }
 
 .hero__brand {
