@@ -23,8 +23,10 @@ function readPath() {
 
 export default function App() {
   const [species, setSpecies] = useState<Species>('dog')
+  const [navSpecies, setNavSpecies] = useState<Species | null>(null)
   const [methodOpen, setMethodOpen] = useState(false)
   const [path, setPath] = useState(readPath)
+  const [scrollToGrades, setScrollToGrades] = useState(false)
 
   const brandCount = useMemo(
     () => CLASS_TIERS.reduce((n, t) => n + t.brands.length, 0),
@@ -35,6 +37,7 @@ export default function App() {
   const blogSlug = path.startsWith('/blog') ? resolveBlogSlug(path) : null
   const isBlog = path === '/blog' || Boolean(blogSlug)
   const activePost = blogSlug ? findPost(blogSlug) : undefined
+  const navIdle = !isBlog && navSpecies === null
 
   const navigate = (to: string) => {
     const next = to.replace(/\/+$/, '') || '/'
@@ -63,22 +66,33 @@ export default function App() {
     }
   }, [methodOpen])
 
+  useEffect(() => {
+    if (!scrollToGrades || isBlog) return
+    setScrollToGrades(false)
+    const toc = document.getElementById('grade-toc')
+    const topbar = document.querySelector('.topbar')
+    if (!toc) return
+    const topbarH = topbar instanceof HTMLElement ? topbar.offsetHeight : 58
+    const top = toc.getBoundingClientRect().top + window.scrollY - topbarH
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' })
+  }, [scrollToGrades, species, isBlog])
+
   const goSpecies = (next: Species) => {
     setSpecies(next)
+    setNavSpecies(next)
     navigate('/')
-    requestAnimationFrame(() => {
-      document.getElementById('ladder')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    })
+    setScrollToGrades(true)
   }
 
   return (
-    <div className="page">
+    <div className={navIdle ? 'page page--nav-idle' : 'page'}>
       <header className="topbar">
         <a
           className="brand"
           href="/"
           onClick={(e) => {
             e.preventDefault()
+            setNavSpecies(null)
             navigate('/')
             window.scrollTo({ top: 0, behavior: 'smooth' })
           }}
@@ -95,16 +109,16 @@ export default function App() {
           </button>
           <button
             type="button"
-            className={!isBlog && species === 'dog' ? 'is-on' : undefined}
-            aria-current={!isBlog && species === 'dog' ? 'page' : undefined}
+            className={navSpecies === 'dog' ? 'is-on' : undefined}
+            aria-current={navSpecies === 'dog' ? 'page' : undefined}
             onClick={() => goSpecies('dog')}
           >
             강아지 사료
           </button>
           <button
             type="button"
-            className={!isBlog && species === 'cat' ? 'is-on' : undefined}
-            aria-current={!isBlog && species === 'cat' ? 'page' : undefined}
+            className={navSpecies === 'cat' ? 'is-on' : undefined}
+            aria-current={navSpecies === 'cat' ? 'page' : undefined}
             onClick={() => goSpecies('cat')}
           >
             고양이 사료
@@ -114,6 +128,7 @@ export default function App() {
             className={isBlog ? 'is-on' : undefined}
             aria-current={isBlog ? 'page' : undefined}
             onClick={() => {
+              setNavSpecies(null)
               navigate('/blog')
               window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
@@ -187,7 +202,7 @@ export default function App() {
         </div>
       </section>
 
-      <section className="toc" aria-label="등급 미리보기">
+      <section className="toc" id="grade-toc" aria-label="등급 미리보기">
         <div className="toc__inner toc__inner--six">
           {CLASS_TIERS.map((t) => (
             <a
