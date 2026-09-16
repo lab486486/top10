@@ -1,2 +1,2 @@
-# Cloudflare Pages — SPA fallback
+# Cloudflare Pages — SPA fallback (existing files like /admin/* win first)
 /*    /index.html   200

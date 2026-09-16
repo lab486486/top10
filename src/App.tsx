@@ -14,11 +14,17 @@ import heroDog from './assets/hero-dog.png'
 import heroCat from './assets/hero-cat.png'
 import { PetfoodMark } from './components/PetfoodMark'
 import { resolveOrigin } from './data/origins'
+import { BlogArticle, BlogList, findPost, resolveBlogSlug } from './components/BlogPage'
 import './App.css'
+
+function readPath() {
+  return window.location.pathname.replace(/\/+$/, '') || '/'
+}
 
 export default function App() {
   const [species, setSpecies] = useState<Species>('dog')
   const [methodOpen, setMethodOpen] = useState(false)
+  const [path, setPath] = useState(readPath)
 
   const brandCount = useMemo(
     () => CLASS_TIERS.reduce((n, t) => n + t.brands.length, 0),
@@ -26,6 +32,22 @@ export default function App() {
   )
 
   const speciesLabel = species === 'dog' ? '강아지' : '고양이'
+  const blogSlug = path.startsWith('/blog') ? resolveBlogSlug(path) : null
+  const isBlog = path === '/blog' || Boolean(blogSlug)
+  const activePost = blogSlug ? findPost(blogSlug) : undefined
+
+  const navigate = (to: string) => {
+    const next = to.replace(/\/+$/, '') || '/'
+    if (next === path) return
+    window.history.pushState({}, '', next)
+    setPath(next)
+  }
+
+  useEffect(() => {
+    const onPop = () => setPath(readPath())
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
 
   useEffect(() => {
     if (!methodOpen) return
@@ -41,10 +63,26 @@ export default function App() {
     }
   }, [methodOpen])
 
+  const goSpecies = (next: Species) => {
+    setSpecies(next)
+    navigate('/')
+    requestAnimationFrame(() => {
+      document.getElementById('ladder')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    })
+  }
+
   return (
     <div className="page">
       <header className="topbar">
-        <a className="brand" href="#top">
+        <a
+          className="brand"
+          href="/"
+          onClick={(e) => {
+            e.preventDefault()
+            navigate('/')
+            window.scrollTo({ top: 0, behavior: 'smooth' })
+          }}
+        >
           <PetfoodMark className="brand__mark" />
           <span className="brand__text">
             PETFOOD
@@ -52,14 +90,59 @@ export default function App() {
           </span>
         </a>
         <nav className="topbar__nav" aria-label="바로가기">
-          <a href="#ladder">계급도</a>
-          <a href="#situations">상황별</a>
           <button type="button" onClick={() => setMethodOpen(true)}>
-            안내
+            펫푸드 스코어
+          </button>
+          <button
+            type="button"
+            className={!isBlog && species === 'dog' ? 'is-on' : undefined}
+            aria-current={!isBlog && species === 'dog' ? 'page' : undefined}
+            onClick={() => goSpecies('dog')}
+          >
+            강아지 사료
+          </button>
+          <button
+            type="button"
+            className={!isBlog && species === 'cat' ? 'is-on' : undefined}
+            aria-current={!isBlog && species === 'cat' ? 'page' : undefined}
+            onClick={() => goSpecies('cat')}
+          >
+            고양이 사료
+          </button>
+          <button
+            type="button"
+            className={isBlog ? 'is-on' : undefined}
+            aria-current={isBlog ? 'page' : undefined}
+            onClick={() => {
+              navigate('/blog')
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+          >
+            블로그
           </button>
         </nav>
       </header>
 
+      {isBlog ? (
+        <>
+          {blogSlug && !activePost ? (
+            <section className="blog">
+              <div className="blog__head">
+                <h2>글을 찾을 수 없습니다</h2>
+                <p>삭제되었거나 주소가 잘못된 게시글입니다.</p>
+              </div>
+              <button type="button" className="blog-article__back" onClick={() => navigate('/blog')}>
+                ← 목록
+              </button>
+            </section>
+          ) : activePost ? (
+            <BlogArticle post={activePost} onBack={() => navigate('/blog')} />
+          ) : (
+            <BlogList onOpen={(slug) => navigate(`/blog/${slug}`)} />
+          )}
+        </>
+      ) : (
+        <>
       <section className="hero" id="top">
         <div className="hero__panels" aria-hidden="true">
           <div className="hero__panel hero__panel--dog">
@@ -182,6 +265,8 @@ export default function App() {
           </ul>
         </div>
       </section>
+        </>
+      )}
 
       <footer className="site-footer">
         <p className="site-footer__copy">{LADDER_COPYRIGHT}</p>
@@ -206,7 +291,7 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal__head">
-              <h2 id="score-method-title">계급도 안내</h2>
+              <h2 id="score-method-title">펫푸드 스코어</h2>
               <button
                 type="button"
                 className="modal__close"
