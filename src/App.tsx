@@ -5,12 +5,13 @@ import {
   LADDER_DISCLAIMER,
   LADDER_ONE_LINER,
   LADDER_SITUATIONS,
-  MARKETING_GRADES,
   coupangSearchUrl,
   findCatalogProducts,
   type TierBrand,
 } from './data/ladder'
 import { GRADE_CONTROVERSY_NOTE } from './data/score'
+import heroDog from './assets/hero-dog.png'
+import heroCat from './assets/hero-cat.png'
 import './App.css'
 
 function formatWon(value: number) {
@@ -56,7 +57,6 @@ export default function App() {
         </a>
         <nav className="topbar__nav" aria-label="바로가기">
           <a href="#ladder">계급도</a>
-          <a href="#grades">등급표</a>
           <a href="#situations">상황별</a>
           <button type="button" onClick={() => setMethodOpen(true)}>
             안내
@@ -66,58 +66,67 @@ export default function App() {
 
       <section className="hero" id="top">
         <div className="hero__wash" aria-hidden="true" />
-        <div className="hero__ladder" aria-hidden="true">
-          {CLASS_TIERS.map((t) => (
-            <span key={t.code} className={`hero__rung hero__rung--${t.tone}`}>
-              {t.latin}
-            </span>
-          ))}
-        </div>
         <div className="hero__inner">
-          <p className="hero__brand">펫푸드</p>
-          <h1>
-            {speciesLabel}
-            <br />
-            사료 계급도
-          </h1>
-          <p className="hero__lead">
-            S·A+·A·평민·노예 — 한눈에 남는 브랜드 서열표
-          </p>
-          <div className="hero__cta">
-            <a className="btn-primary" href="#ladder">
-              계급도 보기
-            </a>
-            <div className="species-switch" role="group" aria-label="반려 종류">
-              <button
-                type="button"
-                className={species === 'dog' ? 'is-on' : undefined}
-                aria-pressed={species === 'dog'}
-                onClick={() => setSpecies('dog')}
-              >
-                강아지
-              </button>
-              <button
-                type="button"
-                className={species === 'cat' ? 'is-on' : undefined}
-                aria-pressed={species === 'cat'}
-                onClick={() => setSpecies('cat')}
-              >
-                고양이
-              </button>
+          <div className="hero__copy">
+            <p className="hero__brand">펫푸드</p>
+            <h1>
+              {speciesLabel}
+              <br />
+              사료 계급도
+            </h1>
+            <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
+            <div className="hero__cta">
+              <div className="species-switch" role="group" aria-label="반려 종류">
+                <button
+                  type="button"
+                  className={species === 'dog' ? 'is-on' : undefined}
+                  aria-pressed={species === 'dog'}
+                  onClick={() => setSpecies('dog')}
+                >
+                  강아지
+                </button>
+                <button
+                  type="button"
+                  className={species === 'cat' ? 'is-on' : undefined}
+                  aria-pressed={species === 'cat'}
+                  onClick={() => setSpecies('cat')}
+                >
+                  고양이
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="hero__visual" aria-hidden="true">
+            <div className="hero-pyramid">
+              {CLASS_TIERS.map((t) => (
+                <div
+                  key={t.code}
+                  className={`hero-pyramid__step hero-pyramid__step--${t.tone}`}
+                  style={{ ['--step' as string]: t.rank }}
+                >
+                  <span>{t.rank}</span>
+                  <strong>{t.name}</strong>
+                </div>
+              ))}
+            </div>
+            <div className="hero-pets">
+              <img src={heroDog} alt="" className="hero-pets__dog" />
+              <img src={heroCat} alt="" className="hero-pets__cat" />
             </div>
           </div>
         </div>
       </section>
 
-      <section className="toc" aria-label="계급 미리보기">
-        <div className="toc__inner toc__inner--five">
+      <section className="toc" aria-label="등급 미리보기">
+        <div className="toc__inner toc__inner--six">
           {CLASS_TIERS.map((t) => (
             <a
               key={t.code}
               className={`toc__item toc__item--${t.tone}`}
               href={`#tier-${t.code}`}
             >
-              <em>{t.rank}</em>
+              <em>{t.latin}</em>
               <strong>{t.name}</strong>
               <span>{t.brands.length}브랜드</span>
             </a>
@@ -136,9 +145,7 @@ export default function App() {
 
         {species === 'cat' ? (
           <div className="empty">
-            <p>
-              고양이 계급도는 준비 중입니다. 강아지 서열을 먼저 보세요.
-            </p>
+            <p>고양이 계급도는 준비 중입니다. 강아지 서열을 먼저 보세요.</p>
             <button type="button" onClick={() => setSpecies('dog')}>
               강아지 계급도 보기
             </button>
@@ -163,7 +170,11 @@ export default function App() {
 
               <ol className="tier__grid">
                 {tier.brands.map((entry, index) => (
-                  <BrandEntry key={`${tier.code}-${entry.brand}`} entry={entry} place={index + 1} />
+                  <BrandEntry
+                    key={`${tier.code}-${entry.brand}`}
+                    entry={entry}
+                    place={index + 1}
+                  />
                 ))}
               </ol>
             </section>
@@ -171,33 +182,10 @@ export default function App() {
         )}
       </main>
 
-      <section className="grades" id="grades">
-        <div className="grades__inner">
-          <h2>시중 마케팅 등급표</h2>
-          <p>
-            로가닉→일반까지 흔히 도는 6단 등급입니다. 공인 인증이 아니라
-            마케팅·커뮤니티 분류예요.
-          </p>
-          <ol className="grades__stairs">
-            {MARKETING_GRADES.map((g) => (
-              <li key={g.rank} className={`grades__step grades__step--${g.rank}`}>
-                <div className="grades__rank">
-                  <em>{g.rank}</em>
-                  <strong>{g.name}</strong>
-                  <span>{g.english}</span>
-                </div>
-                <p>{g.definition}</p>
-                <div className="grades__examples">{g.examples.join(' · ')}</div>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       <section className="situations" id="situations">
         <div className="situations__inner">
           <h2>상황별로는 이렇게</h2>
-          <p>윗계급이 모든 아이에게 최선은 아닙니다.</p>
+          <p>윗등급이 모든 아이에게 최선은 아닙니다.</p>
           <ul>
             {LADDER_SITUATIONS.map((s) => (
               <li key={s.title}>
@@ -238,16 +226,15 @@ export default function App() {
               </button>
             </div>
             <div className="modal__body">
-              <p>
-                메인 계급도는 브랜드를 S·A+·A·평민·노예로 나눈 편집 서열입니다.
-                커뮤니티·수의사 주관 티어리스트 형식을 참고했습니다.
-              </p>
+              <p>{LADDER_ONE_LINER}</p>
               <p>{GRADE_CONTROVERSY_NOTE}</p>
               <ul>
-                <li>S급: 가공 방식별 최상위(오븐·동결·소프트·에어)</li>
-                <li>A+ / A: 주식 후보로 자주 거론되는 상위·중상위</li>
-                <li>평민·노예: 인지도·저가·OEM 구간 — 성분·시설을 더 볼 것</li>
-                <li>아래 6단 등급표는 마케팅 분류 참고용입니다</li>
+                <li>1등급 로가닉: 가공 방식별 최상위(4대천왕 포함)</li>
+                <li>2등급 오가닉: 주식으로 먹기 좋은 상위권</li>
+                <li>3등급 홀리스틱: 가격과 품질을 함께 보는 구간</li>
+                <li>4등급 슈퍼 프리미엄: 고기 함량·보존료를 따지는 구간</li>
+                <li>5등급 프리미엄: 구매 접근성이 쉬운 친근한 브랜드</li>
+                <li>6등급 일반사료: OEM·저가 마트형</li>
               </ul>
             </div>
             <div className="modal__foot">
@@ -293,7 +280,7 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
         target="_blank"
         rel="noopener noreferrer sponsored"
       >
-        쿠팡
+        구매
       </a>
     </li>
   )

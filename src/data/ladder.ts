@@ -1,12 +1,12 @@
 import { products } from './products'
 
-/** 편집 계급 — 시중 티어리스트 구조를 참고한 브랜드 서열 */
-export type TierCode = 'S' | 'Aplus' | 'A' | 'common' | 'slave'
+/** 1~6등급 사료 계급도 */
+export type TierCode = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6'
 
 export type TierBrand = {
   brand: string
   tagline: string
-  /** products.ts 의 brand 필드와 매칭 (있으면 스펙·쿠팡 연결) */
+  /** products.ts 의 brand 필드와 매칭 (있으면 스펙·구매 연결) */
   catalogBrand?: string
 }
 
@@ -16,107 +16,148 @@ export type ClassTier = {
   name: string
   latin: string
   blurb: string
-  tone: 's' | 'aplus' | 'a' | 'common' | 'slave'
+  tone: 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6'
   brands: TierBrand[]
 }
 
 export const CLASS_TIERS: ClassTier[] = [
   {
-    code: 'S',
+    code: 'g1',
     rank: 1,
-    name: 'S급',
-    latin: 'S',
+    name: '로가닉',
+    latin: '1등급',
     blurb: '가공 방식별 최상위 — 이른바 4대천왕',
-    tone: 's',
+    tone: 'g1',
     brands: [
       { brand: '디어니스트키친', tagline: '오븐베이크의 왕좌', catalogBrand: '디 어니스트 키친' },
       { brand: '스텔라앤츄이스', tagline: '동결건조의 왕좌' },
       { brand: '플래티넘', tagline: '소프트건식의 왕좌' },
       { brand: '지위픽', tagline: '에어드라이의 왕좌' },
+      { brand: '캐릭헬스', tagline: '로가닉 자연식 계열' },
+      { brand: '베지투볼', tagline: '원물 살린 자연식' },
+      { brand: '오도독', tagline: '생식·로가닉 감성' },
+      { brand: '소조스', tagline: '생식 믹스 로가닉' },
     ],
   },
   {
-    code: 'Aplus',
+    code: 'g2',
     rank: 2,
-    name: 'A+',
-    latin: 'A+',
-    blurb: '주식으로도 설득력 있는 상위권 — S와 취향 싸움',
-    tone: 'aplus',
+    name: '오가닉',
+    latin: '2등급',
+    blurb: 'S급 못지않으면서 주식으로 먹기에 좋은 브랜드',
+    tone: 'g2',
     brands: [
+      { brand: '오가닉스', tagline: '유기농 라인의 대표격' },
+      { brand: '내추럴발란스 오가닉', tagline: '오가닉 라인 특화' },
+      { brand: '야라', tagline: '유럽 유기농 사료' },
+      { brand: '오리젠', tagline: '고단백 전통 강호', catalogBrand: '오리젠' },
+      { brand: 'ANF 오가닉', tagline: '오가닉 표기 라인' },
+      { brand: '리얼오가닉', tagline: '유기농 원료 강조' },
+      { brand: '카르마', tagline: '오가닉 프리미엄' },
+      { brand: '웨나위', tagline: '오가닉 후보군' },
       { brand: '워프', tagline: '소고기 동결건조 강자' },
       { brand: 'K9 내추럴', tagline: '동결건조 전통 강호' },
-      { brand: '오리젠', tagline: '고단백 전통 강호', catalogBrand: '오리젠' },
       { brand: '테라카니스', tagline: '좋은 건 알겠는데 가격이…', catalogBrand: '테라카니스' },
-      { brand: '아투', tagline: 'LID·고단백을 찾는다면', catalogBrand: '아투(AATU)' },
-      { brand: '벨칸도', tagline: '익스트루전 생육 상위', catalogBrand: '벨칸도' },
-      { brand: '젠틀베이크', tagline: '가성비 오븐베이크 파격' },
       { brand: '카르나4', tagline: '첨가물 없이 사료가 되나?', catalogBrand: '카르나4' },
-      { brand: '고네이티브', tagline: '아일랜드발 미친 가성비' },
-      { brand: '카니러브', tagline: '생육 60%, 더 싸게는 어렵죠' },
-      { brand: '알레바', tagline: '고단백 이탈리아 감성', catalogBrand: '알레바' },
-      { brand: '파미나', tagline: '이탈리아는 사료도 맛있다', catalogBrand: '파미나' },
-      { brand: '허즈', tagline: '대만산, 원료 철학이 독특' },
-      { brand: '인스팅트', tagline: '고기·고기·고기·고기', catalogBrand: '인스팅트' },
-      { brand: '오픈팜', tagline: '동물복지 고기 지향' },
-      { brand: '카나간', tagline: '스펙은 좋은데 호불호', catalogBrand: '카나간' },
-      { brand: '노스포', tagline: '랍스터까지 넣는 과감함' },
-      { brand: '맥아담스', tagline: '영국감 생육·고구마' },
     ],
   },
   {
-    code: 'A',
+    code: 'g3',
     rank: 3,
-    name: 'A급',
-    latin: 'A',
-    blurb: '쓸 만하지만 위에 브랜드가 너무 많은 구간',
-    tone: 'a',
+    name: '홀리스틱',
+    latin: '3등급',
+    blurb: '가격과 품질을 모두 만족스러운 브랜드',
+    tone: 'g3',
     brands: [
-      { brand: '빅스비', tagline: '육류 함량 공개를 기다려' },
+      { brand: '웰니스', tagline: '홀리스틱 대표 브랜드' },
+      { brand: 'GO!', tagline: '펫큐리안 계열 홀리스틱', catalogBrand: '고(GO!)' },
+      { brand: '나우', tagline: '그레인프리 홀리스틱' },
+      { brand: '캐니대', tagline: '홀리스틱 전통' },
+      { brand: '프롬', tagline: '프롬 포스타 라인' },
+      { brand: '이노바', tagline: '홀리스틱 클래식' },
+      { brand: '내추럴코어 홀리스틱', tagline: '국산 홀리스틱 라인' },
+      { brand: '내추럴발란스 홀리스틱', tagline: '홀리스틱 표기 라인' },
+      { brand: 'ANF 홀리스틱', tagline: '홀리스틱 라인' },
+      { brand: '이볼브', tagline: '홀리스틱 후보' },
+      { brand: '헬스와이즈', tagline: '홀리스틱 후보' },
+      { brand: '아투', tagline: 'LID·고단백을 찾는다면', catalogBrand: '아투(AATU)' },
+      { brand: '인스팅트', tagline: '고기 중심 홀리스틱', catalogBrand: '인스팅트' },
+      { brand: '파미나', tagline: '이탈리아 홀리스틱 감성', catalogBrand: '파미나' },
+      { brand: '알레바', tagline: '고단백 이탈리아', catalogBrand: '알레바' },
+      { brand: '카나간', tagline: '스펙은 좋은데 호불호', catalogBrand: '카나간' },
+      { brand: '오픈팜', tagline: '동물복지 고기 지향' },
       { brand: '아카나', tagline: '오리젠 동생(중~고단백)', catalogBrand: '아카나' },
-      { brand: '몬지', tagline: '이탈리아 전통 강호', catalogBrand: '몬지' },
-      { brand: '브릿', tagline: '좋은데 품절이 잦다' },
-      { brand: '써미트10', tagline: '가성비는 한 수 위' },
+    ],
+  },
+  {
+    code: 'g4',
+    rank: 4,
+    name: '슈퍼 프리미엄',
+    latin: '4등급',
+    blurb: '고기 함량이 높고 부산물·보존료를 줄인 슈퍼 프리미엄',
+    tone: 'g4',
+    brands: [
+      { brand: '로얄캐닌', tagline: '설계·인지도 중심 슈퍼프리미엄' },
+      { brand: '벨칸도', tagline: '익스트루전 생육 상위', catalogBrand: '벨칸도' },
+      { brand: '내추럴발란스', tagline: '슈퍼프리미엄 대중 라인' },
+      { brand: '뉴트로', tagline: '슈퍼프리미엄 대표' },
+      { brand: '닥터 클라우더', tagline: '유럽 슈퍼프리미엄' },
+      { brand: '뉴트라골드', tagline: '슈퍼프리미엄 후보' },
+      { brand: '뉴트리소스', tagline: '슈퍼프리미엄 후보' },
+      { brand: 'CJ 엔프레쉬', tagline: '국산 슈퍼프리미엄 마케팅' },
       { brand: '웰츠', tagline: '육류 80%! 구성은 따져볼 것', catalogBrand: '웰츠' },
-      { brand: '오크팜', tagline: '리투아니아산 신흥' },
-      { brand: '게더', tagline: '펫큐리안 3형제 중 첫째' },
-      { brand: '빈티지', tagline: '이름만 빈티지' },
+      { brand: '하림 더리얼', tagline: '국산 오븐베이크 감성', catalogBrand: '하림' },
+      { brand: '몬지', tagline: '이탈리아 전통 강호', catalogBrand: '몬지' },
+      { brand: '젠틀베이크', tagline: '가성비 오븐베이크' },
+      { brand: '카니러브', tagline: '생육 60% 슈퍼프리미엄' },
+      { brand: '고네이티브', tagline: '아일랜드발 가성비' },
+      { brand: '맥아담스', tagline: '영국감 생육·고구마' },
+      { brand: '노스포', tagline: '랍스터까지 넣는 과감함' },
+    ],
+  },
+  {
+    code: 'g5',
+    rank: 5,
+    name: '프리미엄',
+    latin: '5등급',
+    blurb: '구매 접근성이 쉬운 친근한 브랜드',
+    tone: 'g5',
+    brands: [
+      { brand: '프로플랜', tagline: '연구력 있는 친근한 프리미엄' },
+      { brand: '유카누바', tagline: '전통 프리미엄' },
+      { brand: '뉴트라너겟', tagline: '가격 친화 프리미엄' },
+      { brand: '빌잭', tagline: '프리미엄 후보' },
+      { brand: '스포트믹스', tagline: '마트에서도 보이는 프리미엄' },
+      { brand: '이네이쳐', tagline: '프리미엄 후보' },
+      { brand: '힐스', tagline: '처방식은 인정' },
+      { brand: '이즈칸', tagline: '국산 프리미엄 감성' },
+      { brand: '네츄럴코어', tagline: '라인업 제작 대장' },
+      { brand: '피쉬포독', tagline: '눈물 자국 케어로 유명' },
+      { brand: '위시본', tagline: '뉴질랜드 소고기 감성' },
       { brand: '릴리스키친', tagline: '특수 상황·환자식 성격', catalogBrand: '릴리스 키친' },
       { brand: '토우', tagline: '패키지가 진짜 WILD' },
-      { brand: '하림 더리얼', tagline: '국산 오븐베이크 감성', catalogBrand: '하림' },
-      { brand: '나우', tagline: '펫큐리안 3형제 중 둘째' },
-      { brand: '트라이벌', tagline: '콜드프레스, 중저단백' },
-      { brand: '루시펫', tagline: '함량 공개하면 재평가' },
       { brand: '블루버팔로', tagline: '함량 공개하면 재평가' },
-      { brand: 'GO!', tagline: '펫큐리안 3형제 중 셋째', catalogBrand: '고(GO!)' },
+      { brand: '써미트10', tagline: '가성비 프리미엄' },
+      { brand: '브릿', tagline: '좋은데 품절이 잦다' },
     ],
   },
   {
-    code: 'common',
-    rank: 4,
-    name: '평민',
-    latin: '평',
-    blurb: '흔히 보이는 라인 — 브랜드 이미지와 원료 급이 어긋나기 쉬움',
-    tone: 'common',
+    code: 'g6',
+    rank: 6,
+    name: '일반사료',
+    latin: '6등급',
+    blurb: 'OEM 방식의 저가 마트형 브랜드',
+    tone: 'g6',
     brands: [
-      { brand: '위시본', tagline: '뉴질랜드 소고기 감성' },
-      { brand: '네추럴발란스', tagline: '네발 아이는 네발 사료?' },
-      { brand: '피쉬포독', tagline: '눈물 자국 케어로 유명' },
-      { brand: '힐스', tagline: '처방식은 인정' },
-      { brand: '이즈칸', tagline: '조선의 아카나' },
-      { brand: '로얄캐닌', tagline: '원료보다 설계·인지도' },
-      { brand: '네츄럴코어', tagline: '라인업 제작 대장' },
-      { brand: '프로플랜', tagline: '연구력은 있는데 급수는 논쟁' },
-      { brand: '유카누바', tagline: '전통 프리미엄 마케팅권' },
-    ],
-  },
-  {
-    code: 'slave',
-    rank: 5,
-    name: '노예',
-    latin: '노',
-    blurb: '저가·OEM·마트형 — 주식으로 쓰기 전 제조·성분을 더 볼 것',
-    tone: 'slave',
-    brands: [
+      { brand: '알포', tagline: '마트형 일반사료' },
+      { brand: '도그차우', tagline: '저가 주식의 대명사' },
+      { brand: '하이프로', tagline: '마트 저가형' },
+      { brand: '루키', tagline: '저가 일반사료' },
+      { brand: '프리미엄 엑셀', tagline: '이름만 프리미엄' },
+      { brand: '프리미엄 진도', tagline: '마트형 일반' },
+      { brand: '선샤인', tagline: '저가 포뮬러' },
+      { brand: '캐니스', tagline: '일반사료' },
+      { brand: '제로니', tagline: '일반사료' },
       { brand: '더마독', tagline: '셀럽 마케팅이 먼저' },
       { brand: '닥터독', tagline: 'OEM치고는 선전' },
       { brand: '건강백서', tagline: '이름과 내용의 온도 차' },
@@ -129,71 +170,17 @@ export const CLASS_TIERS: ClassTier[] = [
   },
 ]
 
-/** 시중 “사료 등급표” (마케팅 분류) — 공인 인증 아님 */
-export type MarketingGrade = {
-  rank: number
-  name: string
-  english: string
-  definition: string
-  examples: string[]
-}
-
-export const MARKETING_GRADES: MarketingGrade[] = [
-  {
-    rank: 1,
-    name: '로가닉',
-    english: 'Rawganic',
-    definition: 'Raw + Organic. 원물을 최대한 살린 자연식·생식 계열',
-    examples: ['지위픽', '소조스', '오도독', '베지투볼'],
-  },
-  {
-    rank: 2,
-    name: '오가닉',
-    english: 'Organic',
-    definition: '농약·화학비료·항생제 없이 기른 유기농 원료 강조',
-    examples: ['오가닉스', '야라', '오리젠', 'ANF 오가닉'],
-  },
-  {
-    rank: 3,
-    name: '홀리스틱',
-    english: 'Holistic',
-    definition: '합성 보존료·살충제 없이 깨끗하게 만든다는 마케팅 급',
-    examples: ['웰니스', 'GO!', '나우', '캐니대', '프롬'],
-  },
-  {
-    rank: 4,
-    name: '슈퍼 프리미엄',
-    english: 'Super Premium',
-    definition: '고기 함량 높고 부산물·보존료를 줄였다는 급',
-    examples: ['로얄캐닌', '뉴트로', '벨칸도', '내추럴발란스'],
-  },
-  {
-    rank: 5,
-    name: '프리미엄',
-    english: 'Premium',
-    definition: '주원료가 육류 부산물이고 기호성 첨가가 있는 급',
-    examples: ['프로플랜', '유카누바', '뉴트라너겟'],
-  },
-  {
-    rank: 6,
-    name: '일반사료',
-    english: 'Grocery',
-    definition: '마트·저가형 주식 — 가격이 최우선인 구간',
-    examples: ['알포', '도그차우', '하이프로', '루키'],
-  },
-]
-
 export const LADDER_ONE_LINER =
-  '브랜드를 S·A+·A·평민·노예로 나눈 편집 서열입니다. 시중 로가닉~일반 등급표(마케팅)와는 별개예요.'
+  '등급 기준은 펫푸드 스코어 및 소셜 미디어, 커뮤니티 등 의견을 종합한 점수입니다.'
 
 export const LADDER_DISCLAIMER =
-  '이 계급도는 공인 인증·수의사 처방이 아닙니다. 주관적 편집 서열이며, 개체별 건강·알러지·활동량에 따라 맞는 사료는 달라질 수 있습니다. 성분을 확인하고 소량부터 급여하세요.'
+  '이 계급도는 공인 인증·수의사 처방이 아닙니다. 펫푸드 스코어와 커뮤니티 의견을 종합한 참고용이며, 개체별 건강·알러지·활동량에 따라 맞는 사료는 달라질 수 있습니다. 성분을 확인하고 소량부터 급여하세요.'
 
 export const LADDER_SITUATIONS: { title: string; pick: string }[] = [
-  { title: '처음이라 안전하게', pick: 'A+~A에서 단일단백·그레인프리부터' },
-  { title: '가공 방식 중시', pick: 'S급 4대천왕(오븐·동결·소프트·에어)' },
-  { title: '가성비 우선', pick: 'A급의 써미트·웰츠 등과 kg당 가격 비교' },
-  { title: '저가만 보고 고르기 전', pick: '노예·평민은 원료·시설을 더 볼 것' },
+  { title: '처음이라 안전하게', pick: '2~3등급에서 단일단백·그레인프리부터' },
+  { title: '가공 방식 중시', pick: '1등급 로가닉·4대천왕(오븐·동결·소프트·에어)' },
+  { title: '가성비 우선', pick: '3~4등급에서 kg당 가격을 비교' },
+  { title: '저가만 보고 고르기 전', pick: '5~6등급은 원료·시설을 더 볼 것' },
 ]
 
 export function findCatalogProducts(entry: TierBrand) {
