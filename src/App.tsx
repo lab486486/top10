@@ -1,20 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
-import { products, type Species } from './data/products'
+import { type Species } from './data/products'
 import {
   CLASS_TIERS,
   LADDER_DISCLAIMER,
   LADDER_ONE_LINER,
   LADDER_SITUATIONS,
-  tierFromScore,
+  MARKETING_GRADES,
+  coupangSearchUrl,
+  findCatalogProducts,
+  type TierBrand,
 } from './data/ladder'
-import {
-  GRADE_CONTROVERSY_NOTE,
-  MODE_WEIGHTS,
-  SCORE_ONE_LINER,
-  WEIGHT_LABELS,
-} from './data/score'
-import { rankProducts, type RankedProduct } from './lib/rank'
-import { DEFAULT_FILTERS } from './data/presets'
+import { GRADE_CONTROVERSY_NOTE } from './data/score'
 import './App.css'
 
 function formatWon(value: number) {
@@ -25,37 +21,12 @@ export default function App() {
   const [species, setSpecies] = useState<Species>('dog')
   const [methodOpen, setMethodOpen] = useState(false)
 
-  const ranked = useMemo(() => {
-    const filters = {
-      ...DEFAULT_FILTERS,
-      species,
-      meatMin: 0,
-      kibbleMax: 99,
-      priceMinPerKg: 0,
-      priceMaxPerKg: 999999,
-      preferSmallKibble: true,
-      grainFree: false,
-      singleProtein: false,
-      brands: [],
-      lifeStage: 'any' as const,
-      mainProteins: [],
-      kibbleBand: 'any' as const,
-      hydrolyzed: false,
-      glutenFree: false,
-      lid: false,
-    }
-    return rankProducts(products, filters, 'rank')
-  }, [species])
-
-  const byTier = useMemo(() => {
-    return CLASS_TIERS.map((tier) => ({
-      tier,
-      items: ranked.filter((p) => tierFromScore(p.score).code === tier.code),
-    }))
-  }, [ranked])
+  const brandCount = useMemo(
+    () => CLASS_TIERS.reduce((n, t) => n + t.brands.length, 0),
+    [],
+  )
 
   const speciesLabel = species === 'dog' ? '강아지' : '고양이'
-  const weights = MODE_WEIGHTS.rank
 
   useEffect(() => {
     if (!methodOpen) return
@@ -85,9 +56,10 @@ export default function App() {
         </a>
         <nav className="topbar__nav" aria-label="바로가기">
           <a href="#ladder">계급도</a>
+          <a href="#grades">등급표</a>
           <a href="#situations">상황별</a>
           <button type="button" onClick={() => setMethodOpen(true)}>
-            산정 방식
+            안내
           </button>
         </nav>
       </header>
@@ -109,7 +81,7 @@ export default function App() {
             사료 계급도
           </h1>
           <p className="hero__lead">
-            다나와식 스펙표가 아니라, 한눈에 남는 서열표로 고릅니다.
+            S·A+·A·평민·노예 — 한눈에 남는 브랜드 서열표
           </p>
           <div className="hero__cta">
             <a className="btn-primary" href="#ladder">
@@ -138,7 +110,7 @@ export default function App() {
       </section>
 
       <section className="toc" aria-label="계급 미리보기">
-        <div className="toc__inner">
+        <div className="toc__inner toc__inner--five">
           {CLASS_TIERS.map((t) => (
             <a
               key={t.code}
@@ -147,7 +119,7 @@ export default function App() {
             >
               <em>{t.rank}</em>
               <strong>{t.name}</strong>
-              <span>{t.latin}</span>
+              <span>{t.brands.length}브랜드</span>
             </a>
           ))}
         </div>
@@ -157,23 +129,22 @@ export default function App() {
         <div className="ladder__head">
           <h2>
             {speciesLabel} 계급도
-            <span>{ranked.length}개 제품</span>
+            <span>{brandCount}개 브랜드</span>
           </h2>
           <p>{LADDER_ONE_LINER}</p>
         </div>
 
-        {ranked.length === 0 ? (
+        {species === 'cat' ? (
           <div className="empty">
             <p>
-              {speciesLabel} 계급도 데이터는 준비 중입니다. 강아지 계급도를 먼저
-              보세요.
+              고양이 계급도는 준비 중입니다. 강아지 서열을 먼저 보세요.
             </p>
             <button type="button" onClick={() => setSpecies('dog')}>
               강아지 계급도 보기
             </button>
           </div>
         ) : (
-          byTier.map(({ tier, items }) => (
+          CLASS_TIERS.map((tier) => (
             <section
               key={tier.code}
               className={`tier tier--${tier.tone}`}
@@ -186,39 +157,47 @@ export default function App() {
                 </div>
                 <div className="tier__meta">
                   <p>{tier.blurb}</p>
-                  <span>
-                    {tier.min > 0 ? `스코어 ${tier.min}+` : '스코어 60 미만'} ·{' '}
-                    {items.length}개
-                  </span>
+                  <span>{tier.brands.length}개 브랜드</span>
                 </div>
               </header>
 
-              {items.length === 0 ? (
-                <p className="tier__empty">
-                  {tier.code === 'S'
-                    ? '아직 신성 계급에 오른 제품이 없습니다. 기준을 낮추지 않습니다.'
-                    : '이 계급에 해당하는 제품이 아직 없습니다.'}
-                </p>
-              ) : (
-                <ol className="tier__list">
-                  {items.map((product, index) => (
-                    <ProductEntry
-                      key={product.id}
-                      product={product}
-                      place={index + 1}
-                    />
-                  ))}
-                </ol>
-              )}
+              <ol className="tier__grid">
+                {tier.brands.map((entry, index) => (
+                  <BrandEntry key={`${tier.code}-${entry.brand}`} entry={entry} place={index + 1} />
+                ))}
+              </ol>
             </section>
           ))
         )}
       </main>
 
+      <section className="grades" id="grades">
+        <div className="grades__inner">
+          <h2>시중 마케팅 등급표</h2>
+          <p>
+            로가닉→일반까지 흔히 도는 6단 등급입니다. 공인 인증이 아니라
+            마케팅·커뮤니티 분류예요.
+          </p>
+          <ol className="grades__stairs">
+            {MARKETING_GRADES.map((g) => (
+              <li key={g.rank} className={`grades__step grades__step--${g.rank}`}>
+                <div className="grades__rank">
+                  <em>{g.rank}</em>
+                  <strong>{g.name}</strong>
+                  <span>{g.english}</span>
+                </div>
+                <p>{g.definition}</p>
+                <div className="grades__examples">{g.examples.join(' · ')}</div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
       <section className="situations" id="situations">
         <div className="situations__inner">
           <h2>상황별로는 이렇게</h2>
-          <p>1등급이 모든 아이에게 최선은 아닙니다.</p>
+          <p>윗계급이 모든 아이에게 최선은 아닙니다.</p>
           <ul>
             {LADDER_SITUATIONS.map((s) => (
               <li key={s.title}>
@@ -227,26 +206,6 @@ export default function App() {
               </li>
             ))}
           </ul>
-        </div>
-      </section>
-
-      <section className="method-teaser">
-        <div className="method-teaser__inner">
-          <div>
-            <h2>점수는 이렇게 납니다</h2>
-            <p>{SCORE_ONE_LINER}</p>
-          </div>
-          <ul className="weight-strip" aria-label="배점">
-            {WEIGHT_LABELS.map(({ key, label }) => (
-              <li key={key}>
-                <span>{label}</span>
-                <strong>{weights[key]}</strong>
-              </li>
-            ))}
-          </ul>
-          <button type="button" className="btn-ghost" onClick={() => setMethodOpen(true)}>
-            산정 방식 자세히
-          </button>
         </div>
       </section>
 
@@ -268,7 +227,7 @@ export default function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="modal__head">
-              <h2 id="score-method-title">계급도 산정 방식</h2>
+              <h2 id="score-method-title">계급도 안내</h2>
               <button
                 type="button"
                 className="modal__close"
@@ -279,12 +238,16 @@ export default function App() {
               </button>
             </div>
             <div className="modal__body">
-              <p>{SCORE_ONE_LINER}</p>
+              <p>
+                메인 계급도는 브랜드를 S·A+·A·평민·노예로 나눈 편집 서열입니다.
+                커뮤니티·수의사 주관 티어리스트 형식을 참고했습니다.
+              </p>
               <p>{GRADE_CONTROVERSY_NOTE}</p>
               <ul>
-                <li>고기함량·조단백·kg당 가격·알러지 지표·알 크기를 0~100으로 환산</li>
-                <li>공개 가중치로 합산해 100점 스코어 산출</li>
-                <li>스코어 구간으로 신성·최상·상급·실속·보급 계급을 나눕니다</li>
+                <li>S급: 가공 방식별 최상위(오븐·동결·소프트·에어)</li>
+                <li>A+ / A: 주식 후보로 자주 거론되는 상위·중상위</li>
+                <li>평민·노예: 인지도·저가·OEM 구간 — 성분·시설을 더 볼 것</li>
+                <li>아래 6단 등급표는 마케팅 분류 참고용입니다</li>
               </ul>
             </div>
             <div className="modal__foot">
@@ -303,49 +266,35 @@ export default function App() {
   )
 }
 
-function ProductEntry({
-  product,
-  place,
-}: {
-  product: RankedProduct
-  place: number
-}) {
+function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
+  const catalog = findCatalogProducts(entry)
+  const primary = catalog[0]
+  const href = primary?.coupangUrl ?? coupangSearchUrl(entry.brand)
+
   return (
-    <li className="entry">
-      <div className="entry__rank" aria-label={`${place}위`}>
+    <li className="brand-card">
+      <div className="brand-card__rank" aria-hidden="true">
         {place}
       </div>
-      <div className="entry__body">
-        <div className="entry__title">
-          <span className="entry__brand">{product.brand}</span>
-          <h3>{product.name}</h3>
-        </div>
-        <p className="entry__summary">{product.summary}</p>
-        <p className="entry__note">{product.reviewNote}</p>
-        <ul className="entry__tags">
-          <li>고기 {product.meatPercent}%</li>
-          <li>단백 {product.proteinPercent}%</li>
-          <li>알 {product.kibbleSizeMm}mm</li>
-          <li>kg당 {formatWon(product.pricePerKg)}</li>
-          {product.tags.slice(0, 2).map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
+      <div className="brand-card__body">
+        <h3>{entry.brand}</h3>
+        <p>{entry.tagline}</p>
+        {primary && (
+          <ul className="brand-card__specs">
+            <li>고기 {primary.meatPercent}%</li>
+            <li>단백 {primary.proteinPercent}%</li>
+            <li>kg당 {formatWon(primary.pricePerKg)}</li>
+          </ul>
+        )}
       </div>
-      <div className="entry__side">
-        <div className="entry__score">
-          <span>스코어</span>
-          <strong>{Math.round(product.score)}</strong>
-        </div>
-        <a
-          className="entry__buy"
-          href={product.coupangUrl}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-        >
-          쿠팡 보기
-        </a>
-      </div>
+      <a
+        className="brand-card__buy"
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+      >
+        쿠팡
+      </a>
     </li>
   )
 }
