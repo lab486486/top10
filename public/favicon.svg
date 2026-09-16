@@ -1,30 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
-  <rect x="2" y="2" width="76" height="76" rx="16" fill="#1c1f26"/>
-  <!-- tier 1 gold -->
-  <path d="M40 10 L32 25 H40 Z" fill="#f5d76e"/>
-  <path d="M40 10 L40 25 H48 Z" fill="#c99622"/>
-  <!-- tier 2 green -->
-  <path d="M32 25 H40 L40 40 H24.5 Z" fill="#45b482"/>
-  <path d="M40 25 H48 L55.5 40 H40 Z" fill="#247a52"/>
-  <!-- tier 3 slate -->
-  <path d="M24.5 40 H40 L40 55 H17 Z" fill="#7d8596"/>
-  <path d="M40 40 H55.5 L63 55 H40 Z" fill="#4e5666"/>
-  <!-- tier 4 green -->
-  <path d="M17 55 H40 L40 70 H10 Z" fill="#45b482"/>
-  <path d="M40 55 H63 L70 70 H40 Z" fill="#247a52"/>
-  <!-- seams -->
-  <g stroke="#14181f" stroke-width="1.35" stroke-linecap="round">
-    <line x1="32" y1="25" x2="48" y2="25"/>
-    <line x1="24.5" y1="40" x2="55.5" y2="40"/>
-    <line x1="17" y1="55" x2="63" y2="55"/>
-    <line x1="40" y1="10" x2="40" y2="70" opacity="0.55"/>
+  <!-- Corner-on 3D pyramid (diamond): apex top, front tip bottom -->
+  <defs>
+    <linearGradient id="aL" x1="20" y1="10" x2="40" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe28a"/><stop offset="1" stop-color="#efc23a"/>
+    </linearGradient>
+    <linearGradient id="aR" x1="40" y1="10" x2="60" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#e0b030"/><stop offset="1" stop-color="#9a7010"/>
+    </linearGradient>
+    <linearGradient id="bL" x1="10" y1="30" x2="40" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#58c896"/><stop offset="1" stop-color="#2f9a68"/>
+    </linearGradient>
+    <linearGradient id="bR" x1="40" y1="30" x2="70" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2c875a"/><stop offset="1" stop-color="#165a3a"/>
+    </linearGradient>
+    <linearGradient id="cL" x1="10" y1="45" x2="40" y2="45" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9aa3b5"/><stop offset="1" stop-color="#6d7588"/>
+    </linearGradient>
+    <linearGradient id="cR" x1="40" y1="45" x2="70" y2="45" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5a6274"/><stop offset="1" stop-color="#323848"/>
+    </linearGradient>
+    <linearGradient id="dL" x1="10" y1="60" x2="40" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#58c896"/><stop offset="1" stop-color="#2f9a68"/>
+    </linearGradient>
+    <linearGradient id="dR" x1="40" y1="60" x2="70" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2c875a"/><stop offset="1" stop-color="#165a3a"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Diamond silhouette helpers:
+       A(40,6) · WL(22,24) · EL(13,38) · SL(8,50) · Tip(40,74)
+       WR(58,24) · ER(67,38) · SR(72,50)
+       Equator at y≈50 is widest (left 8 / right 72)
+  -->
+
+  <!-- T1 gold -->
+  <path d="M40 6 L22 24 H40 Z" fill="url(#aL)"/>
+  <path d="M40 6 L40 24 H58 Z" fill="url(#aR)"/>
+
+  <!-- T2 green -->
+  <path d="M22 24 H40 L40 38 H13 Z" fill="url(#bL)"/>
+  <path d="M40 24 H58 L67 38 H40 Z" fill="url(#bR)"/>
+
+  <!-- T3 slate -->
+  <path d="M13 38 H40 L40 50 H8 Z" fill="url(#cL)"/>
+  <path d="M40 38 H67 L72 50 H40 Z" fill="url(#cR)"/>
+
+  <!-- T4 green to tip -->
+  <path d="M8 50 H40 L40 74 Z" fill="url(#dL)"/>
+  <path d="M40 50 H72 L40 74 Z" fill="url(#dR)"/>
+
+  <g stroke="#12151c" stroke-width="1.25" stroke-linejoin="round">
+    <path d="M22 24 H58" fill="none"/>
+    <path d="M13 38 H67" fill="none"/>
+    <path d="M8 50 H72" fill="none"/>
+    <path d="M40 6 V74" fill="none" opacity="0.7"/>
   </g>
-  <!-- paw -->
-  <g fill="#1a1d24" transform="translate(40 47.5) scale(0.92)">
-    <ellipse cx="0" cy="2.2" rx="3.4" ry="2.7"/>
-    <circle cx="-4.2" cy="-2.4" r="1.55"/>
-    <circle cx="-1.5" cy="-3.5" r="1.55"/>
-    <circle cx="1.5" cy="-3.5" r="1.55"/>
-    <circle cx="4.2" cy="-2.4" r="1.55"/>
+
+  <g fill="#141820" transform="translate(40 44) scale(0.92)">
+    <ellipse cx="0" cy="2.1" rx="3.2" ry="2.55"/>
+    <circle cx="-4" cy="-2.25" r="1.45"/>
+    <circle cx="-1.4" cy="-3.25" r="1.45"/>
+    <circle cx="1.4" cy="-3.25" r="1.45"/>
+    <circle cx="4" cy="-2.25" r="1.45"/>
   </g>
 </svg>
