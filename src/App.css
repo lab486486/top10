@@ -86,25 +86,47 @@ button {
   height: 2.35rem;
   display: block;
   flex-shrink: 0;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+  object-fit: cover;
+  border: 1.5px solid #fff;
+  box-sizing: border-box;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
 }
 
-.petfood-mark--spin {
+.petfood-mark {
+  display: block;
+  border: 1.5px solid #fff;
+  box-sizing: border-box;
+  background: #000;
+}
+
+.hero-mark {
+  width: 92px;
+  height: 92px;
+  margin-bottom: 0.35rem;
+  perspective: 720px;
+  perspective-origin: 50% 50%;
+  animation: mark-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.petfood-mark--yaw {
   transform-origin: 50% 50%;
-  animation: petfood-spin 18s linear infinite;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  animation: petfood-yaw 10s linear infinite;
+  will-change: transform;
 }
 
-@keyframes petfood-spin {
+@keyframes petfood-yaw {
   from {
-    transform: rotate(0deg);
+    transform: rotateY(0deg);
   }
   to {
-    transform: rotate(360deg);
+    transform: rotateY(360deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .petfood-mark--spin {
+  .petfood-mark--yaw {
     animation: none;
   }
 }
@@ -239,13 +261,6 @@ button {
   }
 }
 
-.hero-mark {
-  width: 92px;
-  height: 92px;
-  margin-bottom: 0.35rem;
-  animation: mark-in 1s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 @keyframes mark-in {
   from {
     opacity: 0;
@@ -261,6 +276,7 @@ button {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: cover;
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.42));
 }
 
