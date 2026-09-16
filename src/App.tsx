@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { type Species } from './data/products'
 import {
   CLASS_TIERS,
-  LADDER_DISCLAIMER,
+  LADDER_COPYRIGHT,
+  LADDER_DISCLAIMER_LINES,
   LADDER_ONE_LINER,
   LADDER_SITUATIONS,
   resolveBrandSpec,
@@ -183,7 +184,12 @@ export default function App() {
       </section>
 
       <footer className="site-footer">
-        <p>{LADDER_DISCLAIMER}</p>
+        <p className="site-footer__copy">{LADDER_COPYRIGHT}</p>
+        <p className="site-footer__note">
+          {LADDER_DISCLAIMER_LINES[0]}
+          <br />
+          {LADDER_DISCLAIMER_LINES[1]}
+        </p>
       </footer>
 
       {methodOpen && (

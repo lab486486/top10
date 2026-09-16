@@ -735,12 +735,21 @@ button {
   border-top: 2px solid var(--ink);
 }
 
-.site-footer p {
+.site-footer__copy {
+  margin: 0 0 1rem;
+  max-width: 50rem;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.site-footer__note {
   margin: 0;
   max-width: 50rem;
   color: var(--ink-soft);
   font-size: 0.8rem;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .empty {

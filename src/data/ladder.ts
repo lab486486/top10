@@ -179,8 +179,12 @@ export const CLASS_TIERS: ClassTier[] = [
 export const LADDER_ONE_LINER =
   '등급 기준은 펫푸드 스코어 및 소셜 미디어, 커뮤니티 등 의견을 종합한 점수입니다.'
 
-export const LADDER_DISCLAIMER =
-  '이 계급도는 공인 인증·수의사 처방이 아닙니다. 펫푸드 스코어와 커뮤니티 의견을 종합한 참고용이며, 개체별 건강·알러지·활동량에 따라 맞는 사료는 달라질 수 있습니다. 성분을 확인하고 소량부터 급여하세요.'
+export const LADDER_COPYRIGHT = '© 2026 PetFood · 강아지 고양이 사료 계급도'
+
+export const LADDER_DISCLAIMER_LINES = [
+  '이 계급도는 펫푸드 스코어를 기반으로 작성된 참고용이며, 판매시 등급을 나누진 않습니다.',
+  '개체별 건강·알러지·활동량에 따라 맞는 사료는 달라질수 있으며 성분을 꼭 확인하고 급여하시기 바랍니다.',
+] as const
 
 export const LADDER_SITUATIONS: { title: string; pick: string }[] = [
   { title: '처음이라 안전하게', pick: '2~3등급에서 단일단백·그레인프리부터' },
