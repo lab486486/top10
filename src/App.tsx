@@ -269,8 +269,7 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
   const catalog = findCatalogProducts(entry)
   const primary = catalog[0]
   const href = primary?.coupangUrl ?? coupangSearchUrl(entry.brand)
-  const meatWidth = primary ? Math.max(8, Math.min(100, primary.meatPercent)) : 0
-  const proteinWidth = primary ? Math.max(8, Math.min(100, primary.proteinPercent * 2.2)) : 0
+  const review = primary?.reviewNote || primary?.summary
 
   return (
     <li className="brand-card">
@@ -294,29 +293,18 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
 
       {primary ? (
         <>
-          <div className="brand-card__metrics" aria-label="핵심 스펙">
-            <div className="metric metric--meat">
-              <span className="metric__label">고기</span>
-              <strong className="metric__value">{primary.meatPercent}%</strong>
-              <div className="metric__bar" aria-hidden="true">
-                <i style={{ width: `${meatWidth}%` }} />
-              </div>
-            </div>
-            <div className="metric metric--protein">
-              <span className="metric__label">단백</span>
-              <strong className="metric__value">{primary.proteinPercent}%</strong>
-              <div className="metric__bar" aria-hidden="true">
-                <i style={{ width: `${proteinWidth}%` }} />
-              </div>
-            </div>
-            <div className="metric metric--price">
-              <span className="metric__label">kg당</span>
-              <strong className="metric__value">
-                {primary.pricePerKg.toLocaleString('ko-KR')}원
-              </strong>
-            </div>
+          <div className="brand-card__emojis" aria-label="핵심 스펙">
+            <span title="고기 함량">
+              <span aria-hidden="true">🍖</span>:{primary.meatPercent}
+            </span>
+            <span title="조단백">
+              <span aria-hidden="true">🥛</span>:{primary.proteinPercent}
+            </span>
+            <span title="알 크기(mm)">
+              <span aria-hidden="true">⚪</span>:{primary.kibbleSizeMm}
+            </span>
           </div>
-          <p className="brand-card__summary">{primary.summary}</p>
+          {review && <p className="brand-card__summary">{review}</p>}
           {primary.tags.length > 0 && (
             <ul className="brand-card__tags">
               {primary.tags.map((tag) => (
@@ -327,7 +315,7 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
         </>
       ) : (
         <p className="brand-card__empty-spec">
-          쿠팡·성분표 대조 스펙은 준비 중 · 구매에서 최신 함량을 확인하세요
+          성분·후기 데이터 미조사 · 구매에서 최신 함량을 확인하세요
         </p>
       )}
     </li>

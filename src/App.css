@@ -490,77 +490,29 @@ button {
   transform: translateY(-1px);
 }
 
-.brand-card__metrics {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.4rem;
-}
-
-.metric {
-  display: grid;
-  gap: 0.15rem;
-  padding: 0.55rem 0.5rem;
-  border: 1.5px solid var(--ink);
-  background: var(--paper);
-  text-align: center;
-}
-
-.metric__label {
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--ink-soft);
-  letter-spacing: 0.02em;
-}
-
-.metric__value {
+.brand-card__emojis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem 1rem;
   font-family: var(--display);
   font-size: 1.15rem;
-  line-height: 1;
   letter-spacing: -0.02em;
+  line-height: 1.2;
   color: var(--ink);
 }
 
-.metric--meat .metric__value {
-  color: #c2410c;
-}
-
-.metric--protein .metric__value {
-  color: #1d4ed8;
-}
-
-.metric--price .metric__value {
-  color: #b91c1c;
-  font-size: 0.82rem;
-  letter-spacing: -0.03em;
-}
-
-.metric__bar {
-  margin-top: 0.2rem;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(10, 31, 24, 0.12);
-  overflow: hidden;
-}
-
-.metric__bar > i {
-  display: block;
-  height: 100%;
-  background: currentColor;
-}
-
-.metric--meat {
-  color: #c2410c;
-}
-
-.metric--protein {
-  color: #1d4ed8;
+.brand-card__emojis > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  font-variant-numeric: tabular-nums;
 }
 
 .brand-card__summary {
   margin: 0;
   color: var(--ink-soft);
-  font-size: 0.78rem;
-  line-height: 1.45;
+  font-size: 0.8rem;
+  line-height: 1.5;
   font-weight: 600;
 }
 
@@ -574,9 +526,9 @@ button {
 }
 
 .brand-card__tags li {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 0.15rem 0.4rem;
+  padding: 0.18rem 0.45rem;
   border: 1.5px solid var(--ink);
   background: var(--paper);
 }
