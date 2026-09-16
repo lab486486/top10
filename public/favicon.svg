@@ -1,12 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <rect width="64" height="64" rx="14" fill="#06b87f"/>
-  <text
-    x="32"
-    y="42"
-    text-anchor="middle"
-    font-family="Pretendard, Apple SD Gothic Neo, Noto Sans KR, sans-serif"
-    font-size="28"
-    font-weight="800"
-    fill="#ffffff"
-  >펫</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="none">
+  <rect x="2" y="2" width="76" height="76" rx="16" fill="#1c1f26"/>
+  <!-- tier 1 gold -->
+  <path d="M40 10 L32 25 H40 Z" fill="#f5d76e"/>
+  <path d="M40 10 L40 25 H48 Z" fill="#c99622"/>
+  <!-- tier 2 green -->
+  <path d="M32 25 H40 L40 40 H24.5 Z" fill="#45b482"/>
+  <path d="M40 25 H48 L55.5 40 H40 Z" fill="#247a52"/>
+  <!-- tier 3 slate -->
+  <path d="M24.5 40 H40 L40 55 H17 Z" fill="#7d8596"/>
+  <path d="M40 40 H55.5 L63 55 H40 Z" fill="#4e5666"/>
+  <!-- tier 4 green -->
+  <path d="M17 55 H40 L40 70 H10 Z" fill="#45b482"/>
+  <path d="M40 55 H63 L70 70 H40 Z" fill="#247a52"/>
+  <!-- seams -->
+  <g stroke="#14181f" stroke-width="1.35" stroke-linecap="round">
+    <line x1="32" y1="25" x2="48" y2="25"/>
+    <line x1="24.5" y1="40" x2="55.5" y2="40"/>
+    <line x1="17" y1="55" x2="63" y2="55"/>
+    <line x1="40" y1="10" x2="40" y2="70" opacity="0.55"/>
+  </g>
+  <!-- paw -->
+  <g fill="#1a1d24" transform="translate(40 47.5) scale(0.92)">
+    <ellipse cx="0" cy="2.2" rx="3.4" ry="2.7"/>
+    <circle cx="-4.2" cy="-2.4" r="1.55"/>
+    <circle cx="-1.5" cy="-3.5" r="1.55"/>
+    <circle cx="1.5" cy="-3.5" r="1.55"/>
+    <circle cx="4.2" cy="-2.4" r="1.55"/>
+  </g>
 </svg>
