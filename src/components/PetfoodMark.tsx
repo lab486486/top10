@@ -2,27 +2,31 @@ import markUrl from '../assets/petfood-mark.png'
 
 type MarkProps = {
   className?: string
-  /** Hero: slow left–right (Y-axis) turn — not wheel spin */
+  /** Hero: Y-axis turn (left–right), not Z-axis wheel spin */
   spin?: boolean
 }
 
-/** PETFOOD mark — provided 3D pyramid image */
+/** Cut-out pyramid mark only (transparent bg) */
 export function PetfoodMark({ className, spin = false }: MarkProps) {
   return (
-    <img
+    <span
       className={[
-        'petfood-mark',
+        'petfood-mark-wrap',
+        spin ? 'petfood-mark-wrap--yaw' : undefined,
         className,
-        spin ? 'petfood-mark--yaw' : undefined,
       ]
         .filter(Boolean)
         .join(' ')}
-      src={markUrl}
-      alt=""
-      width={80}
-      height={80}
-      draggable={false}
-      decoding="async"
-    />
+    >
+      <img
+        className="petfood-mark"
+        src={markUrl}
+        alt=""
+        width={80}
+        height={80}
+        draggable={false}
+        decoding="async"
+      />
+    </span>
   )
 }
