@@ -5,8 +5,7 @@ import {
   LADDER_DISCLAIMER,
   LADDER_ONE_LINER,
   LADDER_SITUATIONS,
-  coupangSearchUrl,
-  findCatalogProducts,
+  resolveBrandSpec,
   type TierBrand,
 } from './data/ladder'
 import { GRADE_CONTROVERSY_NOTE } from './data/score'
@@ -266,10 +265,9 @@ export default function App() {
 }
 
 function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
-  const catalog = findCatalogProducts(entry)
-  const primary = catalog[0]
-  const href = primary?.coupangUrl ?? coupangSearchUrl(entry.brand)
-  const review = primary?.reviewNote || primary?.summary
+  const spec = resolveBrandSpec(entry)
+  const href = spec?.coupangUrl
+  const review = spec?.reviewNote || spec?.summary
 
   return (
     <li className="brand-card">
@@ -283,7 +281,7 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
         </div>
         <a
           className="brand-card__buy"
-          href={href}
+          href={href ?? `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} 강아지 사료`)}`}
           target="_blank"
           rel="noopener noreferrer sponsored"
         >
@@ -291,23 +289,23 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
         </a>
       </div>
 
-      {primary ? (
+      {spec ? (
         <>
           <div className="brand-card__emojis" aria-label="핵심 스펙">
             <span title="고기 함량">
-              <span aria-hidden="true">🍖</span>:{primary.meatPercent}
+              <span aria-hidden="true">🍖</span>:{spec.meatPercent}
             </span>
             <span title="조단백">
-              <span aria-hidden="true">🥛</span>:{primary.proteinPercent}
+              <span aria-hidden="true">🥛</span>:{spec.proteinPercent}
             </span>
             <span title="알 크기(mm)">
-              <span aria-hidden="true">⚪</span>:{primary.kibbleSizeMm}
+              <span aria-hidden="true">⚪</span>:{spec.kibbleSizeMm}mm
             </span>
           </div>
           {review && <p className="brand-card__summary">{review}</p>}
-          {primary.tags.length > 0 && (
+          {spec.tags.length > 0 && (
             <ul className="brand-card__tags">
-              {primary.tags.map((tag) => (
+              {spec.tags.map((tag) => (
                 <li key={tag}>{tag}</li>
               ))}
             </ul>

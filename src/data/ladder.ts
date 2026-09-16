@@ -1,6 +1,7 @@
 import { products } from './products'
+import { BRAND_SPECS, type BrandSpec } from './brandSpecs'
 
-/** 1~6등급 사료 계급도 */
+/** 편집 계급 — 시중 티어리스트 구조를 참고한 브랜드 서열 */
 export type TierCode = 'g1' | 'g2' | 'g3' | 'g4' | 'g5' | 'g6'
 
 export type TierBrand = {
@@ -8,6 +9,11 @@ export type TierBrand = {
   tagline: string
   /** products.ts 의 brand 필드와 매칭 (있으면 스펙·구매 연결) */
   catalogBrand?: string
+}
+
+export type ResolvedSpec = BrandSpec & {
+  coupangUrl: string
+  source: 'catalog' | 'research'
 }
 
 export type ClassTier = {
@@ -190,4 +196,28 @@ export function findCatalogProducts(entry: TierBrand) {
 
 export function coupangSearchUrl(brand: string) {
   return `https://www.coupang.com/np/search?q=${encodeURIComponent(`${brand} 강아지 사료`)}`
+}
+
+/** 카탈로그 우선, 없으면 조사 스펙(BRAND_SPECS) */
+export function resolveBrandSpec(entry: TierBrand): ResolvedSpec | null {
+  const catalog = findCatalogProducts(entry)[0]
+  if (catalog) {
+    return {
+      meatPercent: catalog.meatPercent,
+      proteinPercent: catalog.proteinPercent,
+      kibbleSizeMm: catalog.kibbleSizeMm,
+      summary: catalog.summary,
+      reviewNote: catalog.reviewNote,
+      tags: catalog.tags,
+      coupangUrl: catalog.coupangUrl,
+      source: 'catalog',
+    }
+  }
+  const researched = BRAND_SPECS[entry.brand]
+  if (!researched) return null
+  return {
+    ...researched,
+    coupangUrl: coupangSearchUrl(entry.brand),
+    source: 'research',
+  }
 }
