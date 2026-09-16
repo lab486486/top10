@@ -209,6 +209,7 @@ export function resolveBrandSpec(entry: TierBrand): ResolvedSpec | null {
       summary: catalog.summary,
       reviewNote: catalog.reviewNote,
       tags: catalog.tags,
+      disclosure: 'open',
       coupangUrl: catalog.coupangUrl,
       source: 'catalog',
     }
@@ -217,6 +218,7 @@ export function resolveBrandSpec(entry: TierBrand): ResolvedSpec | null {
   if (!researched) return null
   return {
     ...researched,
+    disclosure: researched.disclosure ?? 'open',
     coupangUrl: coupangSearchUrl(entry.brand),
     source: 'research',
   }

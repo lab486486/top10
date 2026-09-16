@@ -291,17 +291,35 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
 
       {spec ? (
         <>
-          <div className="brand-card__emojis" aria-label="핵심 스펙">
-            <span title="고기 함량">
-              <span aria-hidden="true">🍖</span>:{spec.meatPercent}
-            </span>
-            <span title="조단백">
-              <span aria-hidden="true">🥛</span>:{spec.proteinPercent}
-            </span>
-            <span title="알 크기(mm)">
-              <span aria-hidden="true">⚪</span>:{spec.kibbleSizeMm}mm
-            </span>
-          </div>
+          {spec.disclosure === 'refused' ? (
+            <div
+              className="brand-card__emojis brand-card__emojis--locked"
+              aria-label="함량 공개 거부"
+            >
+              <span title="고기 함량">
+                <span aria-hidden="true">🍖</span>:—
+              </span>
+              <span title="조단백">
+                <span aria-hidden="true">🥛</span>:—
+              </span>
+              <span title="알 크기">
+                <span aria-hidden="true">⚪</span>:—
+              </span>
+              <em className="brand-card__lock">함량 공개 거부</em>
+            </div>
+          ) : (
+            <div className="brand-card__emojis" aria-label="핵심 스펙">
+              <span title="고기 함량">
+                <span aria-hidden="true">🍖</span>:{spec.meatPercent}
+              </span>
+              <span title="조단백">
+                <span aria-hidden="true">🥛</span>:{spec.proteinPercent}
+              </span>
+              <span title="알 크기(mm)">
+                <span aria-hidden="true">⚪</span>:{spec.kibbleSizeMm}mm
+              </span>
+            </div>
+          )}
           {review && <p className="brand-card__summary">{review}</p>}
           {spec.tags.length > 0 && (
             <ul className="brand-card__tags">

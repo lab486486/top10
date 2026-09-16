@@ -6,6 +6,8 @@ export type BrandSpec = {
   summary: string
   reviewNote: string
   tags: string[]
+  /** 육류·원물 함량 공개를 거부/미공개면 refused — UI는 수치 대신 — 표시 */
+  disclosure?: 'open' | 'refused'
 }
 
 /**
@@ -330,7 +332,7 @@ export const BRAND_SPECS: Record<string, BrandSpec> = {
     proteinPercent: 32,
     kibbleSizeMm: 11,
     summary: '랍스터 등 이색 단백으로 화제. 스펙은 상급.',
-    reviewNote: '마케팅  Imp액트 큼. 가격대 상향.',
+    reviewNote: '마케팅 임팩트 큼. 가격대 상향.',
     tags: ['고단백', '그레인프리'],
   },
 
@@ -432,12 +434,13 @@ export const BRAND_SPECS: Record<string, BrandSpec> = {
     tags: ['프리미엄', '고단백', '그레인프리'],
   },
   블루버팔로: {
-    meatPercent: 38,
-    proteinPercent: 26,
-    kibbleSizeMm: 11,
-    summary: '미국 프리미엄. 육류 함량 공개가 아쉽다는 평도.',
-    reviewNote: 'Life Protection 등 조단백 중상.',
-    tags: ['프리미엄'],
+    meatPercent: 0,
+    proteinPercent: 0,
+    kibbleSizeMm: 0,
+    disclosure: 'refused',
+    summary: '미국 프리미엄. 육류 함량 공개가 아쉽다는 평이 반복됨.',
+    reviewNote: '함량 공개 거부/미공개로 분류. 공개되면 재평가 대상.',
+    tags: ['프리미엄', '함량미공개'],
   },
   써미트10: {
     meatPercent: 45,
