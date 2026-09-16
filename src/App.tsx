@@ -47,9 +47,7 @@ export default function App() {
     <div className="page">
       <header className="topbar">
         <a className="brand" href="#top">
-          <span className="brand__mark" aria-hidden="true">
-            계
-          </span>
+          <span className="brand__mark" aria-hidden="true" />
           <span className="brand__text">
             펫푸드
             <small>사료 계급도</small>
@@ -65,54 +63,72 @@ export default function App() {
       </header>
 
       <section className="hero" id="top">
-        <div className="hero__wash" aria-hidden="true" />
-        <div className="hero__inner">
-          <div className="hero__copy">
-            <p className="hero__brand">펫푸드</p>
-            <h1>
-              {speciesLabel}
-              <br />
-              사료 계급도
-            </h1>
-            <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
-            <div className="hero__cta">
-              <div className="species-switch" role="group" aria-label="반려 종류">
-                <button
-                  type="button"
-                  className={species === 'dog' ? 'is-on' : undefined}
-                  aria-pressed={species === 'dog'}
-                  onClick={() => setSpecies('dog')}
-                >
-                  강아지
-                </button>
-                <button
-                  type="button"
-                  className={species === 'cat' ? 'is-on' : undefined}
-                  aria-pressed={species === 'cat'}
-                  onClick={() => setSpecies('cat')}
-                >
-                  고양이
-                </button>
-              </div>
-            </div>
+        <div className="hero__panels" aria-hidden="true">
+          <div className="hero__panel hero__panel--dog">
+            <img src={heroDog} alt="" />
           </div>
-
-          <div className="hero__visual" aria-hidden="true">
-            <div className="hero-pyramid">
-              {CLASS_TIERS.map((t) => (
-                <div
-                  key={t.code}
-                  className={`hero-pyramid__step hero-pyramid__step--${t.tone}`}
-                  style={{ ['--step' as string]: t.rank }}
-                >
-                  <span>{t.rank}</span>
-                  <strong>{t.name}</strong>
-                </div>
-              ))}
-            </div>
-            <div className="hero-pets">
-              <img src={heroDog} alt="" className="hero-pets__dog" />
-              <img src={heroCat} alt="" className="hero-pets__cat" />
+          <div className="hero__panel hero__panel--cat">
+            <img src={heroCat} alt="" />
+          </div>
+        </div>
+        <div className="hero__veil" aria-hidden="true" />
+        <div className="hero__center">
+          <div className="hero-mark" aria-hidden="true">
+            <svg viewBox="0 0 80 72" role="img">
+              <defs>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#f0d78c" />
+                  <stop offset="45%" stopColor="#d4af37" />
+                  <stop offset="100%" stopColor="#8a6a12" />
+                </linearGradient>
+              </defs>
+              <polygon
+                points="40,4 76,68 4,68"
+                fill="url(#goldGrad)"
+                stroke="#5c4a0e"
+                strokeWidth="1.5"
+              />
+              <line x1="22" y1="36" x2="58" y2="36" stroke="#5c4a0e" strokeWidth="1.2" opacity="0.55" />
+              <line x1="15" y1="48" x2="65" y2="48" stroke="#5c4a0e" strokeWidth="1.2" opacity="0.55" />
+              <line x1="9" y1="58" x2="71" y2="58" stroke="#5c4a0e" strokeWidth="1.2" opacity="0.55" />
+              <text
+                x="40"
+                y="30"
+                textAnchor="middle"
+                fill="#3d3208"
+                fontSize="9"
+                fontWeight="700"
+                fontFamily="Pretendard, sans-serif"
+              >
+                1
+              </text>
+            </svg>
+          </div>
+          <p className="hero__brand">펫푸드</p>
+          <h1>
+            {speciesLabel}
+            <br />
+            사료 계급도
+          </h1>
+          <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
+          <div className="hero__cta">
+            <div className="species-switch" role="group" aria-label="반려 종류">
+              <button
+                type="button"
+                className={species === 'dog' ? 'is-on' : undefined}
+                aria-pressed={species === 'dog'}
+                onClick={() => setSpecies('dog')}
+              >
+                강아지
+              </button>
+              <button
+                type="button"
+                className={species === 'cat' ? 'is-on' : undefined}
+                aria-pressed={species === 'cat'}
+                onClick={() => setSpecies('cat')}
+              >
+                고양이
+              </button>
             </div>
           </div>
         </div>
