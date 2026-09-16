@@ -1,0 +1,122 @@
+/** Manufacturing / brand-origin country shown under the buy button */
+export type OriginCountry = {
+  code: string
+  label: string
+  flag: string
+}
+
+const C = {
+  KR: { code: 'KR', label: '한국', flag: '🇰🇷' },
+  US: { code: 'US', label: '미국', flag: '🇺🇸' },
+  CA: { code: 'CA', label: '캐나다', flag: '🇨🇦' },
+  NZ: { code: 'NZ', label: '뉴질랜드', flag: '🇳🇿' },
+  DE: { code: 'DE', label: '독일', flag: '🇩🇪' },
+  UK: { code: 'UK', label: '영국', flag: '🇬🇧' },
+  IT: { code: 'IT', label: '이탈리아', flag: '🇮🇹' },
+  FR: { code: 'FR', label: '프랑스', flag: '🇫🇷' },
+  NL: { code: 'NL', label: '네덜란드', flag: '🇳🇱' },
+  IE: { code: 'IE', label: '아일랜드', flag: '🇮🇪' },
+  CZ: { code: 'CZ', label: '체코', flag: '🇨🇿' },
+  AU: { code: 'AU', label: '호주', flag: '🇦🇺' },
+} as const satisfies Record<string, OriginCountry>
+
+/** Keyed by ladder brand display name */
+export const BRAND_ORIGINS: Record<string, OriginCountry> = {
+  // 1
+  디어니스트키친: C.US,
+  스텔라앤츄이스: C.US,
+  플래티넘: C.DE,
+  지위픽: C.NZ,
+  캐릭헬스: C.KR,
+  베지투볼: C.KR,
+  오도독: C.KR,
+  소조스: C.US,
+  // 2
+  오가닉스: C.US,
+  '내추럴발란스 오가닉': C.US,
+  야라: C.NL,
+  오리젠: C.CA,
+  'ANF 오가닉': C.US,
+  리얼오가닉: C.KR,
+  카르마: C.KR,
+  웨나위: C.KR,
+  워프: C.NZ,
+  'K9 내추럴': C.NZ,
+  테라카니스: C.DE,
+  카르나4: C.CA,
+  // 3
+  웰니스: C.US,
+  'GO!': C.CA,
+  나우: C.CA,
+  캐니대: C.US,
+  프롬: C.US,
+  이노바: C.US,
+  '내추럴코어 홀리스틱': C.KR,
+  '내추럴발란스 홀리스틱': C.US,
+  'ANF 홀리스틱': C.US,
+  이볼브: C.US,
+  헬스와이즈: C.AU,
+  아투: C.UK,
+  인스팅트: C.US,
+  파미나: C.IT,
+  알레바: C.IT,
+  카나간: C.CA,
+  오픈팜: C.CA,
+  아카나: C.CA,
+  // 4
+  로얄캐닌: C.FR,
+  벨칸도: C.DE,
+  내추럴발란스: C.US,
+  뉴트로: C.US,
+  '닥터 클라우더': C.DE,
+  뉴트라골드: C.US,
+  뉴트리소스: C.US,
+  'CJ 엔프레쉬': C.KR,
+  웰츠: C.KR,
+  '하림 더리얼': C.KR,
+  몬지: C.IT,
+  젠틀베이크: C.KR,
+  카니러브: C.CZ,
+  고네이티브: C.IE,
+  맥아담스: C.UK,
+  노스포: C.KR,
+  // 5
+  프로플랜: C.US,
+  유카누바: C.US,
+  뉴트라너겟: C.US,
+  빌잭: C.US,
+  스포트믹스: C.US,
+  이네이쳐: C.KR,
+  힐스: C.US,
+  이즈칸: C.KR,
+  네츄럴코어: C.KR,
+  피쉬포독: C.KR,
+  위시본: C.NZ,
+  릴리스키친: C.UK,
+  토우: C.NZ,
+  블루버팔로: C.US,
+  써미트10: C.KR,
+  브릿: C.CZ,
+  // 6
+  알포: C.US,
+  도그차우: C.US,
+  하이프로: C.KR,
+  루키: C.KR,
+  '프리미엄 엑셀': C.KR,
+  '프리미엄 진도': C.KR,
+  선샤인: C.KR,
+  캐니스: C.KR,
+  제로니: C.KR,
+  더마독: C.KR,
+  닥터독: C.KR,
+  건강백서: C.KR,
+  해피랑: C.KR,
+  국가대표: C.KR,
+  원스: C.KR,
+  금동사료: C.KR,
+  잘먹잘싸: C.KR,
+}
+
+export function resolveOrigin(brand: string): OriginCountry | undefined {
+  return BRAND_ORIGINS[brand]
+}

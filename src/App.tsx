@@ -11,6 +11,8 @@ import {
 import { GRADE_CONTROVERSY_NOTE } from './data/score'
 import heroDog from './assets/hero-dog.png'
 import heroCat from './assets/hero-cat.png'
+import { PetfoodMark } from './components/PetfoodMark'
+import { resolveOrigin } from './data/origins'
 import './App.css'
 
 export default function App() {
@@ -42,9 +44,9 @@ export default function App() {
     <div className="page">
       <header className="topbar">
         <a className="brand" href="#top">
-          <span className="brand__mark" aria-hidden="true" />
+          <PetfoodMark className="brand__mark" />
           <span className="brand__text">
-            펫푸드
+            PETFOOD
             <small>사료 계급도</small>
           </span>
         </a>
@@ -69,58 +71,7 @@ export default function App() {
         <div className="hero__veil" aria-hidden="true" />
         <div className="hero__center">
           <div className="hero-mark" aria-hidden="true">
-            <svg viewBox="0 0 72 72" role="img" className="hero-mark__svg">
-              <defs>
-                <linearGradient id="petGold" x1="18%" y1="8%" x2="86%" y2="92%">
-                  <stop offset="0%" stopColor="#f7e7a8" />
-                  <stop offset="38%" stopColor="#e0bc4a" />
-                  <stop offset="72%" stopColor="#c4931f" />
-                  <stop offset="100%" stopColor="#8a6410" />
-                </linearGradient>
-                <linearGradient id="petGoldSoft" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#fff3c4" />
-                  <stop offset="100%" stopColor="#d4af37" />
-                </linearGradient>
-                <filter id="petSoft" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="2" stdDeviation="1.2" floodColor="#000" floodOpacity="0.28" />
-                </filter>
-              </defs>
-              {/* badge ring */}
-              <circle
-                cx="36"
-                cy="36"
-                r="33"
-                fill="rgba(12,14,18,0.22)"
-                stroke="url(#petGoldSoft)"
-                strokeWidth="1.4"
-              />
-              <circle
-                cx="36"
-                cy="36"
-                r="28.5"
-                fill="rgba(12,14,18,0.35)"
-                stroke="rgba(240,215,140,0.28)"
-                strokeWidth="0.8"
-              />
-              {/* stepped pyramid — grade ladder as brand mark */}
-              <g filter="url(#petSoft)" fill="url(#petGold)">
-                <path d="M36 14 L41.2 22.8 H30.8 Z" />
-                <path d="M28.4 25.2 H43.6 L46.2 30.2 H25.8 Z" />
-                <path d="M24.2 32.6 H47.8 L50.4 37.6 H21.6 Z" />
-                <path d="M20 40 H52 L54.6 45 H17.4 Z" />
-                <path d="M15.8 47.4 H56.2 L58.8 52.4 H13.2 Z" />
-                <path d="M11.6 54.8 H60.4 L62.2 58.8 H9.8 Z" />
-              </g>
-              {/* highlight edge */}
-              <path
-                d="M36 14 L30.8 22.8 L25.8 30.2 L21.6 37.6 L17.4 45 L13.2 52.4 L9.8 58.8"
-                fill="none"
-                stroke="#fff6d0"
-                strokeWidth="1.1"
-                strokeLinecap="round"
-                opacity="0.45"
-              />
-            </svg>
+            <PetfoodMark className="hero-mark__svg" />
           </div>
           <p className="hero__brand">PETFOOD</p>
           <h1>
@@ -291,6 +242,7 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
   const spec = resolveBrandSpec(entry)
   const href = spec?.coupangUrl
   const review = spec?.reviewNote || spec?.summary
+  const origin = resolveOrigin(entry.brand)
 
   return (
     <li className="brand-card">
@@ -302,14 +254,26 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
           <h3>{entry.brand}</h3>
           <p>{entry.tagline}</p>
         </div>
-        <a
-          className="brand-card__buy"
-          href={href ?? `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} 강아지 사료`)}`}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-        >
-          구매
-        </a>
+        <div className="brand-card__buy-col">
+          <a
+            className="brand-card__buy"
+            href={href ?? `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} 강아지 사료`)}`}
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+          >
+            구매
+          </a>
+          {origin && (
+            <span
+              className="brand-card__origin"
+              title={`제조국 ${origin.label}`}
+              aria-label={`제조국 ${origin.label}`}
+            >
+              <span aria-hidden="true">{origin.flag}</span>
+              <span className="brand-card__origin-label">{origin.label}</span>
+            </span>
+          )}
+        </div>
       </div>
 
       {spec ? (
