@@ -14,10 +14,6 @@ import heroDog from './assets/hero-dog.png'
 import heroCat from './assets/hero-cat.png'
 import './App.css'
 
-function formatWon(value: number) {
-  return `${value.toLocaleString('ko-KR')}원`
-}
-
 export default function App() {
   const [species, setSpecies] = useState<Species>('dog')
   const [methodOpen, setMethodOpen] = useState(false)
@@ -273,31 +269,67 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
   const catalog = findCatalogProducts(entry)
   const primary = catalog[0]
   const href = primary?.coupangUrl ?? coupangSearchUrl(entry.brand)
+  const meatWidth = primary ? Math.max(8, Math.min(100, primary.meatPercent)) : 0
+  const proteinWidth = primary ? Math.max(8, Math.min(100, primary.proteinPercent * 2.2)) : 0
 
   return (
     <li className="brand-card">
-      <div className="brand-card__rank" aria-hidden="true">
-        {place}
+      <div className="brand-card__top">
+        <div className="brand-card__rank" aria-hidden="true">
+          {place}
+        </div>
+        <div className="brand-card__title">
+          <h3>{entry.brand}</h3>
+          <p>{entry.tagline}</p>
+        </div>
+        <a
+          className="brand-card__buy"
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer sponsored"
+        >
+          구매
+        </a>
       </div>
-      <div className="brand-card__body">
-        <h3>{entry.brand}</h3>
-        <p>{entry.tagline}</p>
-        {primary && (
-          <ul className="brand-card__specs">
-            <li>고기 {primary.meatPercent}%</li>
-            <li>단백 {primary.proteinPercent}%</li>
-            <li>kg당 {formatWon(primary.pricePerKg)}</li>
-          </ul>
-        )}
-      </div>
-      <a
-        className="brand-card__buy"
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer sponsored"
-      >
-        구매
-      </a>
+
+      {primary ? (
+        <>
+          <div className="brand-card__metrics" aria-label="핵심 스펙">
+            <div className="metric metric--meat">
+              <span className="metric__label">고기</span>
+              <strong className="metric__value">{primary.meatPercent}%</strong>
+              <div className="metric__bar" aria-hidden="true">
+                <i style={{ width: `${meatWidth}%` }} />
+              </div>
+            </div>
+            <div className="metric metric--protein">
+              <span className="metric__label">단백</span>
+              <strong className="metric__value">{primary.proteinPercent}%</strong>
+              <div className="metric__bar" aria-hidden="true">
+                <i style={{ width: `${proteinWidth}%` }} />
+              </div>
+            </div>
+            <div className="metric metric--price">
+              <span className="metric__label">kg당</span>
+              <strong className="metric__value">
+                {primary.pricePerKg.toLocaleString('ko-KR')}원
+              </strong>
+            </div>
+          </div>
+          <p className="brand-card__summary">{primary.summary}</p>
+          {primary.tags.length > 0 && (
+            <ul className="brand-card__tags">
+              {primary.tags.map((tag) => (
+                <li key={tag}>{tag}</li>
+              ))}
+            </ul>
+          )}
+        </>
+      ) : (
+        <p className="brand-card__empty-spec">
+          쿠팡·성분표 대조 스펙은 준비 중 · 구매에서 최신 함량을 확인하세요
+        </p>
+      )}
     </li>
   )
 }

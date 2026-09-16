@@ -32,6 +32,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 7.5rem;
 }
 
 body {
@@ -59,15 +60,16 @@ button {
 .topbar {
   position: sticky;
   top: 0;
-  z-index: 40;
+  z-index: 50;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem clamp(1rem, 4vw, 2.5rem);
-  background: rgba(238, 243, 234, 0.92);
+  min-height: 58px;
+  padding: 0.65rem clamp(1rem, 4vw, 2.5rem);
+  background: rgba(247, 250, 244, 0.94);
   backdrop-filter: blur(10px);
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1px solid var(--line);
 }
 
 .brand {
@@ -243,8 +245,13 @@ button {
 }
 
 .toc {
+  position: sticky;
+  top: 58px;
+  z-index: 45;
   border-bottom: 2px solid var(--ink);
-  background: var(--ink);
+  background: rgba(10, 31, 24, 0.96);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 20px rgba(10, 31, 24, 0.18);
 }
 
 .toc__inner {
@@ -261,35 +268,36 @@ button {
 
 .toc__item {
   display: grid;
-  gap: 0.15rem;
-  padding: 1rem 0.75rem;
+  gap: 0.1rem;
+  padding: 0.7rem 0.55rem;
   text-decoration: none;
   color: var(--ink);
   background: var(--paper);
-  transition: transform 0.18s ease;
+  transition: filter 0.15s ease, box-shadow 0.15s ease;
 }
 
 .toc__item:hover {
-  transform: translateY(-3px);
-  z-index: 1;
+  filter: brightness(1.04);
+  box-shadow: inset 0 -3px 0 var(--ink);
 }
 
 .toc__item em {
   font-style: normal;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 800;
   opacity: 0.65;
 }
 
 .toc__item strong {
   font-family: var(--display);
-  font-size: 1.35rem;
+  font-size: clamp(0.95rem, 2vw, 1.2rem);
   letter-spacing: -0.03em;
 }
 
 .toc__item span {
-  font-family: var(--display);
-  font-size: 0.85rem;
+  font-family: var(--body);
+  font-size: 0.68rem;
+  font-weight: 700;
   opacity: 0.55;
 }
 
@@ -341,6 +349,7 @@ button {
   border: 2px solid var(--ink);
   background: var(--panel);
   overflow: clip;
+  scroll-margin-top: 7.5rem;
 }
 
 .tier__head {
@@ -416,40 +425,45 @@ button {
 .tier__grid {
   list-style: none;
   margin: 0;
-  padding: 0.75rem;
+  padding: 0.85rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.7rem;
 }
 
 .brand-card {
   display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem 0.95rem;
+  border: 2px solid var(--ink);
+  background: #fff;
+}
+
+.brand-card__top {
+  display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 0.55rem;
   align-items: start;
-  padding: 0.75rem 0.8rem;
-  border: 2px solid var(--ink);
-  background: var(--paper);
 }
 
 .brand-card__rank {
-  width: 1.7rem;
-  height: 1.7rem;
+  width: 1.85rem;
+  height: 1.85rem;
   display: grid;
   place-items: center;
   border: 2px solid var(--ink);
-  background: #fff;
+  background: var(--paper);
   font-family: var(--display);
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
-.brand-card__body h3 {
+.brand-card__title h3 {
   margin: 0;
-  font-size: 0.95rem;
+  font-size: 1.02rem;
   letter-spacing: -0.02em;
 }
 
-.brand-card__body p {
+.brand-card__title p {
   margin: 0.25rem 0 0;
   color: var(--ink-soft);
   font-size: 0.78rem;
@@ -457,39 +471,124 @@ button {
   font-weight: 600;
 }
 
-.brand-card__specs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  list-style: none;
-  margin: 0.45rem 0 0;
-  padding: 0;
-}
-
-.brand-card__specs li {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.12rem 0.35rem;
-  border: 1.5px solid var(--ink);
-  background: #fff;
-}
-
 .brand-card__buy {
-  align-self: center;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.55rem;
+  align-self: start;
+  padding: 0.45rem 0.7rem;
   background: var(--flame);
   color: #fff;
   text-decoration: none;
-  font-size: 0.72rem;
+  font-size: 0.76rem;
   font-weight: 800;
   border: 2px solid var(--ink);
+  white-space: nowrap;
 }
 
 .brand-card__buy:hover {
   transform: translateY(-1px);
+}
+
+.brand-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.4rem;
+}
+
+.metric {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.55rem 0.5rem;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+  text-align: center;
+}
+
+.metric__label {
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+
+.metric__value {
+  font-family: var(--display);
+  font-size: 1.15rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.metric--meat .metric__value {
+  color: #c2410c;
+}
+
+.metric--protein .metric__value {
+  color: #1d4ed8;
+}
+
+.metric--price .metric__value {
+  color: #b91c1c;
+  font-size: 0.82rem;
+  letter-spacing: -0.03em;
+}
+
+.metric__bar {
+  margin-top: 0.2rem;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(10, 31, 24, 0.12);
+  overflow: hidden;
+}
+
+.metric__bar > i {
+  display: block;
+  height: 100%;
+  background: currentColor;
+}
+
+.metric--meat {
+  color: #c2410c;
+}
+
+.metric--protein {
+  color: #1d4ed8;
+}
+
+.brand-card__summary {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+.brand-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.brand-card__tags li {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border: 1.5px solid var(--ink);
+  background: var(--paper);
+}
+
+.brand-card__empty-spec {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  border: 1.5px dashed var(--line);
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #fbfcf9;
 }
 
 .situations {
