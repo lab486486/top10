@@ -86,8 +86,27 @@ button {
   height: 2.35rem;
   display: block;
   flex-shrink: 0;
-  object-fit: contain;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+}
+
+.petfood-mark--spin {
+  transform-origin: 50% 50%;
+  animation: petfood-spin 18s linear infinite;
+}
+
+@keyframes petfood-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petfood-mark--spin {
+    animation: none;
+  }
 }
 
 .brand__text {
@@ -237,7 +256,6 @@ button {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: contain;
   filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.42));
 }
 

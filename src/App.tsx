@@ -155,7 +155,7 @@ export default function App() {
         <div className="hero__veil" aria-hidden="true" />
         <div className="hero__center">
           <div className="hero-mark" aria-hidden="true">
-            <PetfoodMark className="hero-mark__svg" />
+            <PetfoodMark className="hero-mark__svg" spin />
           </div>
           <p className="hero__brand">PETFOOD</p>
           <h1>
