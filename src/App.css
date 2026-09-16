@@ -16,6 +16,7 @@
   --tier-g6: #d8f3ea;
   --display: 'Black Han Sans', 'Pretendard', sans-serif;
   --body: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+  --metric: 'IBM Plex Sans KR', 'Pretendard', sans-serif;
   color: var(--ink);
   background: var(--paper);
   font-family: var(--body);
@@ -493,24 +494,42 @@ button {
 .brand-card__emojis {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 0.55rem 1rem;
-  font-family: var(--display);
-  font-size: 1.15rem;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+  align-items: baseline;
+  gap: 0.45rem 1.1rem;
+  font-family: var(--metric);
+  font-size: 1.02rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
   color: var(--ink);
 }
 
 .brand-card__emojis > span {
   display: inline-flex;
-  align-items: center;
-  gap: 0.1rem;
+  align-items: baseline;
+  gap: 0.15rem;
   font-variant-numeric: tabular-nums;
+}
+
+.brand-card__emojis > span > [aria-hidden='true'] {
+  font-size: 1.05em;
+  line-height: 1;
+}
+
+.brand-card__stat {
+  font-weight: 600;
+  font-size: 1.08em;
+  letter-spacing: -0.01em;
+  color: #14352a;
 }
 
 .brand-card__emojis--locked {
   color: var(--ink-soft);
+}
+
+.brand-card__emojis--locked .brand-card__stat {
+  color: var(--ink-soft);
+  font-weight: 500;
 }
 
 .brand-card__lock {

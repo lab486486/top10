@@ -297,26 +297,32 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
               aria-label="함량 공개 거부"
             >
               <span title="고기 함량">
-                <span aria-hidden="true">🍖</span>:—
+                <span aria-hidden="true">🍖</span>
+                <span className="brand-card__stat">:—</span>
               </span>
               <span title="조단백">
-                <span aria-hidden="true">🥛</span>:—
+                <span aria-hidden="true">🥛</span>
+                <span className="brand-card__stat">:—</span>
               </span>
               <span title="알 크기">
-                <span aria-hidden="true">⚪</span>:—
+                <span aria-hidden="true">⚪</span>
+                <span className="brand-card__stat">:—</span>
               </span>
               <em className="brand-card__lock">함량 공개 거부</em>
             </div>
           ) : (
             <div className="brand-card__emojis" aria-label="핵심 스펙">
               <span title="고기 함량">
-                <span aria-hidden="true">🍖</span>:{spec.meatPercent}
+                <span aria-hidden="true">🍖</span>
+                <span className="brand-card__stat">:{spec.meatPercent}</span>
               </span>
               <span title="조단백">
-                <span aria-hidden="true">🥛</span>:{spec.proteinPercent}
+                <span aria-hidden="true">🥛</span>
+                <span className="brand-card__stat">:{spec.proteinPercent}</span>
               </span>
               <span title="알 크기(mm)">
-                <span aria-hidden="true">⚪</span>:{spec.kibbleSizeMm}mm
+                <span aria-hidden="true">⚪</span>
+                <span className="brand-card__stat">:{spec.kibbleSizeMm}mm</span>
               </span>
             </div>
           )}
