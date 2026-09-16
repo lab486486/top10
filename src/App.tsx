@@ -69,37 +69,60 @@ export default function App() {
         <div className="hero__veil" aria-hidden="true" />
         <div className="hero__center">
           <div className="hero-mark" aria-hidden="true">
-            <svg viewBox="0 0 80 72" role="img">
+            <svg viewBox="0 0 72 72" role="img" className="hero-mark__svg">
               <defs>
-                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#f0d78c" />
-                  <stop offset="45%" stopColor="#d4af37" />
-                  <stop offset="100%" stopColor="#8a6a12" />
+                <linearGradient id="petGold" x1="18%" y1="8%" x2="86%" y2="92%">
+                  <stop offset="0%" stopColor="#f7e7a8" />
+                  <stop offset="38%" stopColor="#e0bc4a" />
+                  <stop offset="72%" stopColor="#c4931f" />
+                  <stop offset="100%" stopColor="#8a6410" />
                 </linearGradient>
+                <linearGradient id="petGoldSoft" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#fff3c4" />
+                  <stop offset="100%" stopColor="#d4af37" />
+                </linearGradient>
+                <filter id="petSoft" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="2" stdDeviation="1.2" floodColor="#000" floodOpacity="0.28" />
+                </filter>
               </defs>
-              <polygon
-                points="40,4 76,68 4,68"
-                fill="url(#goldGrad)"
-                stroke="#5c4a0e"
-                strokeWidth="1.5"
+              {/* badge ring */}
+              <circle
+                cx="36"
+                cy="36"
+                r="33"
+                fill="rgba(12,14,18,0.22)"
+                stroke="url(#petGoldSoft)"
+                strokeWidth="1.4"
               />
-              <line x1="22" y1="36" x2="58" y2="36" stroke="#5c4a0e" strokeWidth="1.2" opacity="0.55" />
-              <line x1="15" y1="48" x2="65" y2="48" stroke="#5c4a0e" strokeWidth="1.2" opacity="0.55" />
-              <line x1="9" y1="58" x2="71" y2="58" stroke="#5c4a0e" strokeWidth="1.2" opacity="0.55" />
-              <text
-                x="40"
-                y="30"
-                textAnchor="middle"
-                fill="#3d3208"
-                fontSize="9"
-                fontWeight="700"
-                fontFamily="Pretendard, sans-serif"
-              >
-                1
-              </text>
+              <circle
+                cx="36"
+                cy="36"
+                r="28.5"
+                fill="rgba(12,14,18,0.35)"
+                stroke="rgba(240,215,140,0.28)"
+                strokeWidth="0.8"
+              />
+              {/* stepped pyramid — grade ladder as brand mark */}
+              <g filter="url(#petSoft)" fill="url(#petGold)">
+                <path d="M36 14 L41.2 22.8 H30.8 Z" />
+                <path d="M28.4 25.2 H43.6 L46.2 30.2 H25.8 Z" />
+                <path d="M24.2 32.6 H47.8 L50.4 37.6 H21.6 Z" />
+                <path d="M20 40 H52 L54.6 45 H17.4 Z" />
+                <path d="M15.8 47.4 H56.2 L58.8 52.4 H13.2 Z" />
+                <path d="M11.6 54.8 H60.4 L62.2 58.8 H9.8 Z" />
+              </g>
+              {/* highlight edge */}
+              <path
+                d="M36 14 L30.8 22.8 L25.8 30.2 L21.6 37.6 L17.4 45 L13.2 52.4 L9.8 58.8"
+                fill="none"
+                stroke="#fff6d0"
+                strokeWidth="1.1"
+                strokeLinecap="round"
+                opacity="0.45"
+              />
             </svg>
           </div>
-          <p className="hero__brand">펫푸드</p>
+          <p className="hero__brand">PETFOOD</p>
           <h1>
             {speciesLabel}
             <br />
