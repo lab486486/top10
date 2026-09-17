@@ -230,17 +230,27 @@ export default function App() {
             type="button"
             className={species === 'dog' ? 'is-on' : undefined}
             aria-pressed={species === 'dog'}
+            aria-label="강아지"
             onClick={() => setSpecies('dog')}
           >
-            강아지
+            <span className="hero__species-label">
+              <span>강</span>
+              <span>아</span>
+              <span>지</span>
+            </span>
           </button>
           <button
             type="button"
             className={species === 'cat' ? 'is-on' : undefined}
             aria-pressed={species === 'cat'}
+            aria-label="고양이"
             onClick={() => setSpecies('cat')}
           >
-            고양이
+            <span className="hero__species-label">
+              <span>고</span>
+              <span>양</span>
+              <span>이</span>
+            </span>
           </button>
         </div>
       </section>
