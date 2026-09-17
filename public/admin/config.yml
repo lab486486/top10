@@ -55,6 +55,7 @@ collections:
         time_format: HH:mm
         picker_utc: false
         default: '{{now}}'
+        hint: 사이트 글에 보이는 발행일입니다. 관리자 목록 오른쪽 시각은 Git 저장 시각을 씁니다.
 
       - label: 설명
         name: summary
