@@ -2,14 +2,18 @@
 
 강아지·고양이 사료 브랜드를 **공개 스코어 서열(1~6등급)**로 비교하는 사이트입니다.
 
+- 사이트: https://petfood.pe.kr
 - 상단: 펫푸드 스코어 / 강아지 사료 / 고양이 사료 / 블로그
 - 계급도: 브랜드 카드(스펙·국기·구매 링크)
 - 블로그: `content/blog/*.md` — Decap CMS(`/admin`)로 작성
+- RSS: https://petfood.pe.kr/rss
+- Sitemap: https://petfood.pe.kr/sitemap.xml
 
 ## 실행
 
 ```bash
 npm install
+npm run feeds   # RSS·sitemap·robots 생성
 npm run dev
 ```
 
@@ -18,11 +22,14 @@ npm run build
 npm run preview
 ```
 
+`npm run build` 시 `prebuild`로 피드가 자동 생성됩니다.
+
 ## 블로그 · Decap CMS
 
 관리자: 배포 사이트 기준 `/admin/`  
 게시글 폴더: `content/blog/`  
-업로드: `public/uploads/`
+업로드: `public/uploads/`  
+GitHub 저장소: `lab486486/top10` (이름을 `petfood`로 바꾼 뒤 Decap `repo` 설정도 같이 바꾸세요)
 
 ### 로컬에서 글 쓰기
 
@@ -47,9 +54,8 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
 1. **GitHub OAuth App 생성**
    - GitHub → Settings → Developer settings → OAuth Apps → New
    - Application name: `PETFOOD Decap` (자유)
-   - Homepage URL: `https://top10-4ri.pages.dev` (또는 커스텀 도메인)
-   - Authorization callback URL: `https://top10-4ri.pages.dev/api/oauth/callback`  
-     (커스텀 도메인을 쓰면 그 도메인의 `/api/oauth/callback` 도 추가)
+   - Homepage URL: `https://petfood.pe.kr`
+   - Authorization callback URL: `https://petfood.pe.kr/api/oauth/callback`
    - Client ID / Client Secret 발급
 
 2. **Cloudflare Pages 환경변수**
@@ -61,7 +67,7 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
      또는 `main`에 커밋 푸시. **변수만 저장하고 재배포하지 않으면 Functions에 안 보입니다.**
 
 3. **확인**
-   - `https://top10-4ri.pages.dev/api/oauth/auth` 접속 시 GitHub로 리다이렉트되면 OK  
+   - `https://petfood.pe.kr/api/oauth/auth` 접속 시 GitHub로 리다이렉트되면 OK  
      (`GITHUB_CLIENT_ID 환경변수가…` 문구가 나오면 아직 미반영)
    - `/admin` → Login with GitHub → 팝업이 **같은 도메인** `/api/oauth/auth` 로 열려야 함
    - 로그인 GitHub 계정은 `lab486486/top10` **push 권한** 필요
@@ -69,6 +75,17 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
 로컬 글쓰기(`npx decap-server`)는 OAuth 없이 가능합니다.
 
 OAuth Client Secret은 이 저장소에 올리지 마세요.
+
+## 네이버 서치어드바이저
+
+소유 확인 후 아래를 제출하세요.
+
+| 종류 | URL |
+| --- | --- |
+| RSS | `https://petfood.pe.kr/rss` |
+| 사이트맵 | `https://petfood.pe.kr/sitemap.xml` |
+
+RSS는 RSS 2.0 + UTF-8이며, 글 **본문 전체**를 `<description>`에 넣고, 모든 link/guid가 `petfood.pe.kr` 도메인입니다. SPA HTML이 아니라 정적 XML로 응답합니다 (`Content-Type: application/rss+xml`).
 
 ## Cloudflare Pages 배포
 
@@ -79,7 +96,7 @@ OAuth Client Secret은 이 저장소에 올리지 마세요.
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
 4. Production branch: `main`
-5. Custom domain 연결 (선택)
+5. Custom domain: `petfood.pe.kr`
 
 ```bash
 npm i -g wrangler

@@ -1,0 +1,11 @@
+# Cloudflare Pages — correct MIME so Naver Search Advisor accepts feeds
+/rss
+  Content-Type: application/rss+xml; charset=UTF-8
+  Cache-Control: public, max-age=300
+
+/sitemap.xml
+  Content-Type: application/xml; charset=UTF-8
+  Cache-Control: public, max-age=300
+
+/robots.txt
+  Content-Type: text/plain; charset=UTF-8
