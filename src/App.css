@@ -342,6 +342,15 @@ button {
   }
 }
 
+@keyframes hero-in-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes mark-in {
   from {
     opacity: 0;
@@ -1385,31 +1394,43 @@ button {
   .hero-mark {
     width: 72px;
     height: 72px;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0;
   }
 
-  /* 카피: 선택 레일 왼쪽 선 기준 영역의 중앙 정렬 */
+  /* 카피: 선택 레일 왼쪽 선 기준 중앙 + 경계선 위로 올림 */
   .hero > .hero__center {
     --hero-rail-w: 3.6rem;
     --hero-rail-gap: 0.65rem;
     width: auto;
     max-width: none;
     justify-self: stretch;
-    margin: 0;
-    padding: 0.85rem calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0.85rem 0.75rem;
+    align-self: center;
+    /* 중앙 정렬 기준에서 블록 전체를 위로 → PETFOOD·제목이 경계선 위 */
+    margin: 0 0 11vh;
+    padding: 0.5rem calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0.5rem 0.75rem;
     text-align: center;
     justify-items: center;
+    gap: 0.18rem;
+    animation-name: hero-in-fade;
+  }
+
+  .hero__brand {
+    letter-spacing: 0.28em;
+    text-indent: 0.28em;
   }
 
   .hero h1 {
     font-size: clamp(1.7rem, 7.2vw, 2.25rem);
+    line-height: 1;
     text-shadow:
       0 1px 2px rgba(0, 0, 0, 0.55),
       0 4px 18px rgba(0, 0, 0, 0.4);
   }
 
   .hero__lead {
+    margin-top: 0.06rem;
     font-size: 0.9rem;
+    line-height: 1.25;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
   }
