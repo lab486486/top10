@@ -230,14 +230,18 @@ export default function App() {
         </div>
         <div className="hero__veil" aria-hidden="true" />
         <div className="hero__center">
-          <div className="hero-mark" aria-hidden="true">
-            <PetfoodMark className="hero-mark__svg" />
+          <div className="hero__brand-block">
+            <div className="hero-mark" aria-hidden="true">
+              <PetfoodMark className="hero-mark__svg" />
+            </div>
+            <p className="hero__brand">PETFOOD</p>
           </div>
-          <p className="hero__brand">PETFOOD</p>
-          <h1>
-            {speciesLabel} 사료 계급도
-          </h1>
-          <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
+          <div className="hero__copy-block">
+            <h1>
+              {speciesLabel} 사료 계급도
+            </h1>
+            <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
+          </div>
         </div>
         <div className="hero__species" role="group" aria-label="반려 종류">
           <button

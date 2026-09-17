@@ -331,6 +331,21 @@ button {
   animation: hero-in 0.85s ease both;
 }
 
+.hero__brand-block,
+.hero__copy-block {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+}
+
+.hero__brand-block {
+  gap: 0.35rem;
+}
+
+.hero__copy-block {
+  gap: 0.35rem;
+}
+
 @keyframes hero-in {
   from {
     opacity: 0;
@@ -1401,20 +1416,40 @@ button {
     margin-bottom: 0;
   }
 
-  /* 카피: 선택 레일 왼쪽 선 기준 중앙 + 강아지 영역(경계선 위)에 배치 */
+  /*
+   * 모바일: 강아지/고양이 사진 경계(50%) 기준
+   * 위(강아지) = 로고 + PETFOOD / 아래(고양이) = 제목 + 리드
+   */
   .hero > .hero__center {
     --hero-rail-w: 3.6rem;
     --hero-rail-gap: 0.65rem;
     width: auto;
     max-width: none;
+    height: 100%;
     justify-self: stretch;
-    align-self: start;
+    align-self: stretch;
     margin: 0;
-    padding: clamp(1.1rem, 4.5vh, 2rem) calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0.35rem 0.75rem;
+    padding: 0 calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0 0.75rem;
     text-align: center;
-    justify-items: center;
-    gap: 0.14rem;
+    justify-items: stretch;
+    align-content: stretch;
+    gap: 0;
+    grid-template-rows: 1fr 1fr;
     animation-name: hero-in-fade;
+  }
+
+  .hero__brand-block {
+    align-content: center;
+    justify-items: center;
+    gap: 0.2rem;
+    padding: 0.55rem 0 0.35rem;
+  }
+
+  .hero__copy-block {
+    align-content: center;
+    justify-items: center;
+    gap: 0.18rem;
+    padding: 0.35rem 0 0.55rem;
   }
 
   .hero__brand {
@@ -1431,14 +1466,14 @@ button {
   }
 
   .hero__lead {
-    margin-top: 0.02rem;
+    margin-top: 0;
     font-size: 0.9rem;
-    line-height: 1.2;
+    line-height: 1.25;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
   }
 
-  /* 선택 레일: 중앙선 기준 높이 절반, 폭 80%, 세로 글자, 배경 50% */
+  /* 선택 레일: 중앙선 기준 높이 절반, 세로 글자 */
   .hero > .hero__species {
     --hero-rail-w: 3.6rem;
     flex-direction: column;
