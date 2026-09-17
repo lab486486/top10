@@ -53,15 +53,17 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
    - Client ID / Client Secret 발급
 
 2. **Cloudflare Pages 환경변수**
-   - Workers & Pages → `petfood`(또는 해당 프로젝트) → Settings → Environment variables
-   - Production에 추가:
+   - Workers & Pages → **`petfood`** 프로젝트 → Settings → Environment variables
+   - **Production** 환경에 추가 (Preview만 넣으면 본 도메인에 안 붙음):
      - `GITHUB_CLIENT_ID` = OAuth App Client ID
-     - `GITHUB_CLIENT_SECRET` = OAuth App Client Secret
-   - 저장 후 **재배포** (환경변수만 넣으면 기존 배포에 안 붙을 수 있음)
+     - `GITHUB_CLIENT_SECRET` = OAuth App Client Secret (Encrypt 권장)
+   - 저장 후 **반드시 재배포**: Deployments → 최신 배포 **Retry deployment**  
+     또는 `main`에 커밋 푸시. **변수만 저장하고 재배포하지 않으면 Functions에 안 보입니다.**
 
 3. **확인**
-   - `https://top10-4ri.pages.dev/admin/` 접속
-   - Login with GitHub → 팝업이 **같은 도메인** `/auth` 로 열려야 함 (netlify.com 이면 안 됨)
+   - `https://top10-4ri.pages.dev/auth` 접속 시 GitHub로 리다이렉트되면 OK  
+     (`GITHUB_CLIENT_ID 환경변수가…` 문구가 나오면 아직 미반영)
+   - `/admin` → Login with GitHub → 팝업이 **같은 도메인** `/auth` 로 열려야 함
    - 로그인 GitHub 계정은 `lab486486/top10` **push 권한** 필요
 
 로컬 글쓰기(`npx decap-server`)는 OAuth 없이 가능합니다.

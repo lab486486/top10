@@ -1,10 +1,22 @@
 /**
  * Decap CMS GitHub OAuth — step 2
  * GET /callback  →  exchange code, postMessage token to opener
- *
- * Env: GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
  */
-function htmlPage(scriptBody) {
+function readGithubCreds(env) {
+  const clientId =
+    env.GITHUB_CLIENT_ID ||
+    env.OAUTH_CLIENT_ID ||
+    env.GITHUB_OAUTH_CLIENT_ID ||
+    ''
+  const clientSecret =
+    env.GITHUB_CLIENT_SECRET ||
+    env.OAUTH_CLIENT_SECRET ||
+    env.GITHUB_OAUTH_CLIENT_SECRET ||
+    ''
+  return { clientId, clientSecret }
+}
+
+function htmlPage(scriptBody, bodyText) {
   return `<!doctype html>
 <html lang="ko">
   <head>
@@ -19,11 +31,13 @@ function htmlPage(scriptBody) {
         font-family: system-ui, sans-serif;
         background: #f4f7f2;
         color: #14231c;
+        padding: 1.5rem;
+        white-space: pre-wrap;
       }
     </style>
   </head>
   <body>
-    <p>GitHub 로그인 처리 중…</p>
+    <p>${bodyText || 'GitHub 로그인 처리 중…'}</p>
     <script>${scriptBody}</script>
   </body>
 </html>`
@@ -31,13 +45,22 @@ function htmlPage(scriptBody) {
 
 export async function onRequestGet(context) {
   const { env, request } = context
-  const clientId = env.GITHUB_CLIENT_ID
-  const clientSecret = env.GITHUB_CLIENT_SECRET
+  const { clientId, clientSecret } = readGithubCreds(env)
 
   if (!clientId || !clientSecret) {
+    const keys = Object.keys(env || {})
+      .filter((k) => k !== 'ASSETS')
+      .sort()
     return new Response(
       htmlPage(
-        `document.body.innerHTML = '<p>OAuth 환경변수(GITHUB_CLIENT_ID / GITHUB_CLIENT_SECRET)가 없습니다.</p>'`,
+        '',
+        [
+          'OAuth 환경변수가 이 배포에 없습니다.',
+          `clientId: ${clientId ? '있음' : '없음'} / clientSecret: ${clientSecret ? '있음' : '없음'}`,
+          `런타임 키: ${keys.length ? keys.join(', ') : '(없음)'}`,
+          '',
+          'petfood 프로젝트 Production 변수 저장 후 재배포가 필요합니다.',
+        ].join('\n'),
       ),
       { status: 500, headers: { 'content-type': 'text/html; charset=utf-8' } },
     )
@@ -66,7 +89,10 @@ export async function onRequestGet(context) {
 
   if (!code || !state || !expected || state !== expected) {
     return new Response(
-      htmlPage(`document.body.textContent = 'OAuth state 검증 실패. 다시 로그인해 주세요.';`),
+      htmlPage(
+        '',
+        'OAuth state 검증 실패. /admin 에서 다시 Login with GitHub 를 눌러 주세요.',
+      ),
       { status: 400, headers: { 'content-type': 'text/html; charset=utf-8' } },
     )
   }
@@ -110,7 +136,6 @@ export async function onRequestGet(context) {
     htmlPage(`
       (function () {
         const msg = 'authorization:github:success:' + ${JSON.stringify(payload)};
-        const origins = [window.location.origin, '*'];
         if (window.opener) {
           window.opener.postMessage(msg, window.location.origin);
           window.close();
