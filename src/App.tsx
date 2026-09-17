@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { type Species } from './data/products'
 import {
+  adaptCopyForSpecies,
   getClassTiers,
   getLadderSituations,
   LADDER_COPYRIGHT,
@@ -176,9 +177,7 @@ export default function App() {
           </div>
           <p className="hero__brand">PETFOOD</p>
           <h1>
-            {speciesLabel}
-            <br />
-            사료 계급도
+            {speciesLabel} 사료 계급도
           </h1>
           <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
           <div className="hero__cta">
@@ -223,7 +222,7 @@ export default function App() {
       <main className="ladder" id="ladder">
         <div className="ladder__head">
           <h2>
-            {speciesLabel} 계급도
+            {speciesLabel} 사료 계급도
             <span>{brandCount}개 브랜드</span>
           </h2>
           <p>{LADDER_ONE_LINER}</p>
@@ -352,8 +351,12 @@ function BrandEntry({
   const href =
     spec?.coupangUrl ??
     `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} ${kind}`)}`
-  const review = spec?.reviewNote || spec?.summary
+  const review = adaptCopyForSpecies(
+    spec?.reviewNote || spec?.summary || '',
+    species,
+  )
   const origin = resolveOrigin(entry.brand)
+  const tagline = adaptCopyForSpecies(entry.tagline, species)
 
   return (
     <li className="brand-card">
@@ -363,7 +366,7 @@ function BrandEntry({
         </div>
         <div className="brand-card__title">
           <h3>{entry.brand}</h3>
-          <p>{entry.tagline}</p>
+          <p>{tagline}</p>
         </div>
         <div className="brand-card__buy-col">
           <a

@@ -352,6 +352,51 @@ export function coupangSearchUrl(brand: string, species: Species = 'dog') {
   return `https://www.coupang.com/np/search?q=${encodeURIComponent(`${brand} ${kind}`)}`
 }
 
+/**
+ * 고양이 화면에서 강아지(견) 표현이 섞이지 않도록 카피 치환.
+ * 긴 단어부터 바꿔 ‘의견’ 같은 일반어는 건드리지 않는다.
+ */
+const DOG_TO_CAT_TERMS: [RegExp, string][] = [
+  [/알레르기견/g, '알레르기묘'],
+  [/알러지견/g, '알러지묘'],
+  [/민감견/g, '민감묘'],
+  [/노령견/g, '노령묘'],
+  [/소형견/g, '소형묘'],
+  [/대형견/g, '대형묘'],
+  [/일반견/g, '일반묘'],
+  [/환견/g, '환묘'],
+  [/성견/g, '성묘'],
+  [/견종별/g, '품종별'],
+  [/견종설계/g, '품종설계'],
+  [/견종/g, '품종'],
+  [/강아지에게/g, '고양이에게'],
+  [/강아지/g, '고양이'],
+  [/퍼피/g, '키튼'],
+  // 견→묘 치환 후 조사 보정
+  [/묘은/g, '묘는'],
+  [/묘이(?![가-힣])/g, '묘가'],
+  [/묘을/g, '묘를'],
+]
+
+export function adaptCopyForSpecies(text: string, species: Species): string {
+  if (species !== 'cat' || !text) return text
+  return DOG_TO_CAT_TERMS.reduce((out, [pattern, repl]) => out.replace(pattern, repl), text)
+}
+
+function adaptSpecForSpecies(
+  spec: Omit<ResolvedSpec, 'coupangUrl' | 'source'> &
+    Partial<Pick<ResolvedSpec, 'coupangUrl' | 'source'>>,
+  species: Species,
+): typeof spec {
+  if (species !== 'cat') return spec
+  return {
+    ...spec,
+    summary: adaptCopyForSpecies(spec.summary, species),
+    reviewNote: adaptCopyForSpecies(spec.reviewNote, species),
+    tags: spec.tags.map((tag) => adaptCopyForSpecies(tag, species)),
+  }
+}
+
 /** 카탈로그 우선, 없으면 조사 스펙(BRAND_SPECS) */
 export function resolveBrandSpec(
   entry: TierBrand,
@@ -360,13 +405,18 @@ export function resolveBrandSpec(
   const catalog = findCatalogProducts(entry)[0]
   if (catalog) {
     return {
-      meatPercent: catalog.meatPercent,
-      proteinPercent: catalog.proteinPercent,
-      kibbleSizeMm: catalog.kibbleSizeMm,
-      summary: catalog.summary,
-      reviewNote: catalog.reviewNote,
-      tags: catalog.tags,
-      disclosure: 'open',
+      ...adaptSpecForSpecies(
+        {
+          meatPercent: catalog.meatPercent,
+          proteinPercent: catalog.proteinPercent,
+          kibbleSizeMm: catalog.kibbleSizeMm,
+          summary: catalog.summary,
+          reviewNote: catalog.reviewNote,
+          tags: catalog.tags,
+          disclosure: 'open',
+        },
+        species,
+      ),
       coupangUrl:
         species === 'cat' ? coupangSearchUrl(entry.brand, 'cat') : catalog.coupangUrl,
       source: 'catalog',
@@ -375,8 +425,13 @@ export function resolveBrandSpec(
   const researched = BRAND_SPECS[entry.brand]
   if (!researched) return null
   return {
-    ...researched,
-    disclosure: researched.disclosure ?? 'open',
+    ...adaptSpecForSpecies(
+      {
+        ...researched,
+        disclosure: researched.disclosure ?? 'open',
+      },
+      species,
+    ),
     coupangUrl: coupangSearchUrl(entry.brand, species),
     source: 'research',
   }
