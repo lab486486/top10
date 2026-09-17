@@ -632,22 +632,13 @@ button {
 .brand-card__origin {
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--ink-soft);
+  justify-content: center;
   line-height: 1;
-  letter-spacing: -0.01em;
 }
 
 .brand-card__origin > [aria-hidden='true'] {
-  font-size: 0.95rem;
+  font-size: 1.9rem;
   line-height: 1;
-}
-
-.brand-card__origin-label {
-  font-size: 0.62rem;
-  font-weight: 700;
 }
 
 .brand-card__emojis {

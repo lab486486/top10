@@ -376,7 +376,6 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
               aria-label={`제조국 ${origin.label}`}
             >
               <span aria-hidden="true">{origin.flag}</span>
-              <span className="brand-card__origin-label">{origin.label}</span>
             </span>
           )}
         </div>
