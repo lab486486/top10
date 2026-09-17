@@ -26,6 +26,7 @@ export default function App() {
   const [species, setSpecies] = useState<Species>('dog')
   const [navSpecies, setNavSpecies] = useState<Species | null>(null)
   const [methodOpen, setMethodOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   const [path, setPath] = useState(readPath)
   const [scrollToGrades, setScrollToGrades] = useState(false)
 
@@ -70,6 +71,19 @@ export default function App() {
   }, [methodOpen])
 
   useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [menuOpen])
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [path])
+
+  useEffect(() => {
     if (!scrollToGrades || isBlog) return
     setScrollToGrades(false)
     const toc = document.getElementById('grade-toc')
@@ -83,19 +97,21 @@ export default function App() {
   const goSpecies = (next: Species) => {
     setSpecies(next)
     setNavSpecies(next)
+    setMenuOpen(false)
     navigate('/')
     setScrollToGrades(true)
   }
 
   return (
     <div className={navIdle ? 'page page--nav-idle' : 'page'}>
-      <header className="topbar">
+      <header className={menuOpen ? 'topbar topbar--menu-open' : 'topbar'}>
         <a
           className="brand"
           href="/"
           onClick={(e) => {
             e.preventDefault()
             setNavSpecies(null)
+            setMenuOpen(false)
             navigate('/')
             window.scrollTo({ top: 0, behavior: 'smooth' })
           }}
@@ -106,8 +122,32 @@ export default function App() {
             <small>사료 계급도</small>
           </span>
         </a>
-        <nav className="topbar__nav" aria-label="바로가기">
-          <button type="button" onClick={() => setMethodOpen(true)}>
+        <button
+          type="button"
+          className="topbar__burger"
+          aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
+          aria-expanded={menuOpen}
+          aria-controls="topbar-nav"
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span className="topbar__burger-lines" aria-hidden="true" />
+        </button>
+        {menuOpen && (
+          <button
+            type="button"
+            className="topbar__scrim"
+            aria-label="메뉴 닫기"
+            onClick={() => setMenuOpen(false)}
+          />
+        )}
+        <nav className="topbar__nav" id="topbar-nav" aria-label="바로가기">
+          <button
+            type="button"
+            onClick={() => {
+              setMenuOpen(false)
+              setMethodOpen(true)
+            }}
+          >
             펫푸드 스코어
           </button>
           <button
@@ -132,6 +172,7 @@ export default function App() {
             aria-current={isBlog ? 'page' : undefined}
             onClick={() => {
               setNavSpecies(null)
+              setMenuOpen(false)
               navigate('/blog')
               window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
@@ -183,26 +224,24 @@ export default function App() {
             {speciesLabel} 사료 계급도
           </h1>
           <p className="hero__lead">한눈에 보는 강아지, 고양이 사료 브랜드</p>
-          <div className="hero__cta">
-            <div className="species-switch" role="group" aria-label="반려 종류">
-              <button
-                type="button"
-                className={species === 'dog' ? 'is-on' : undefined}
-                aria-pressed={species === 'dog'}
-                onClick={() => setSpecies('dog')}
-              >
-                강아지
-              </button>
-              <button
-                type="button"
-                className={species === 'cat' ? 'is-on' : undefined}
-                aria-pressed={species === 'cat'}
-                onClick={() => setSpecies('cat')}
-              >
-                고양이
-              </button>
-            </div>
-          </div>
+        </div>
+        <div className="hero__species" role="group" aria-label="반려 종류">
+          <button
+            type="button"
+            className={species === 'dog' ? 'is-on' : undefined}
+            aria-pressed={species === 'dog'}
+            onClick={() => setSpecies('dog')}
+          >
+            강아지
+          </button>
+          <button
+            type="button"
+            className={species === 'cat' ? 'is-on' : undefined}
+            aria-pressed={species === 'cat'}
+            onClick={() => setSpecies('cat')}
+          >
+            고양이
+          </button>
         </div>
       </section>
 
