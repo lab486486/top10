@@ -37,7 +37,7 @@ collections:
     view_filters:
       - label: 초안만
         field: draft
-        pattern: true
+        pattern: 'true'
     fields:
       - label: 제목
         name: title
@@ -78,4 +78,6 @@ collections:
           - quote
           - bulleted-list
           - numbered-list
+        editor_components:
           - image
+          - code-block
