@@ -46,9 +46,18 @@ export function BlogList({ onOpen }: { onOpen: (slug: string) => void }) {
           {blogPosts.map((post) => (
             <li key={post.slug}>
               <button type="button" className="blog__card" onClick={() => onOpen(post.slug)}>
-                <time dateTime={post.date}>{formatDate(post.date)}</time>
-                <strong>{post.title}</strong>
-                {post.summary && <span>{post.summary}</span>}
+                <span className="blog__thumb" aria-hidden={!post.thumbnail}>
+                  {post.thumbnail ? (
+                    <img src={post.thumbnail} alt="" loading="lazy" />
+                  ) : (
+                    <span className="blog__thumb-fallback" />
+                  )}
+                </span>
+                <span className="blog__card-copy">
+                  <time dateTime={post.date}>{formatDate(post.date)}</time>
+                  <strong>{post.title}</strong>
+                  {post.summary && <span>{post.summary}</span>}
+                </span>
               </button>
             </li>
           ))}
