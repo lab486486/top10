@@ -29,7 +29,7 @@ npm run preview
 관리자: 배포 사이트 기준 `/admin/`  
 게시글 폴더: `content/blog/`  
 업로드: `public/uploads/`  
-GitHub 저장소: `lab486486/petfood` (구 `top10` — GitHub에서 저장소 이름을 `petfood`로 바꿔 주세요)
+GitHub 저장소: `lab486486/top10` (이름을 `petfood`로 바꾼 뒤 Decap `repo` 설정도 같이 바꾸세요)
 
 ### 로컬에서 글 쓰기
 
@@ -70,7 +70,7 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
    - `https://petfood.pe.kr/api/oauth/auth` 접속 시 GitHub로 리다이렉트되면 OK  
      (`GITHUB_CLIENT_ID 환경변수가…` 문구가 나오면 아직 미반영)
    - `/admin` → Login with GitHub → 팝업이 **같은 도메인** `/api/oauth/auth` 로 열려야 함
-   - 로그인 GitHub 계정은 `lab486486/petfood` **push 권한** 필요
+   - 로그인 GitHub 계정은 `lab486486/top10` **push 권한** 필요
 
 로컬 글쓰기(`npx decap-server`)는 OAuth 없이 가능합니다.
 
@@ -90,7 +90,7 @@ RSS는 RSS 2.0 + UTF-8이며, 글 **본문 전체**를 `<description>`에 넣고
 ## Cloudflare Pages 배포
 
 1. [Cloudflare Dashboard](https://dash.cloudflare.com) → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-2. GitHub 저장소 `lab486486/petfood` 연결
+2. GitHub 저장소 `lab486486/top10` 연결
 3. 빌드 설정:
    - **Framework preset:** Vite
    - **Build command:** `npm run build`
