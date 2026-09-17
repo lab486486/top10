@@ -76,6 +76,25 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
 
 OAuth Client Secret은 이 저장소에 올리지 마세요.
 
+## 쿠팡 파트너스 (구매 버튼)
+
+브랜드 카드 **구매**는 `/api/coupang/buy` Functions로 연결됩니다.  
+서버에서 Partners Open API로 상품을 검색한 뒤, 제휴 딥링크로 302 리다이렉트합니다.
+
+1. [쿠팡 파트너스](https://partners.coupang.com) → 도구 → Open API → Access Key / Secret Key 발급
+2. Cloudflare Pages → **`petfood`** → Settings → Environment variables → **Production**:
+   - `COUPANG_ACCESS_KEY`
+   - `COUPANG_SECRET_KEY` (Encrypt 권장)
+   - (선택) `COUPANG_SUB_ID` — 채널 구분용, 기본값 `petfood`
+3. **재배포 필수** (변수만 저장하면 Functions에 안 보임): Deployments → Retry, 또는 `main` 푸시
+4. 확인:
+   - `https://petfood.pe.kr/api/coupang/buy?brand=로얄캐닌&species=dog&debug=1`  
+     → `{"ok":true,"target":"https://..."}` 이면 OK  
+     → `missing COUPANG_…` 이면 키/재배포 미반영
+   - 계급도에서 **구매** 클릭 시 쿠팡 상품(또는 제휴 검색)으로 이동
+
+키·시크릿은 저장소/채팅에 넣지 마세요. 노출됐다면 파트너스에서 재발급하세요.
+
 ## 네이버 서치어드바이저
 
 소유 확인 후 아래를 제출하세요.

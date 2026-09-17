@@ -349,6 +349,9 @@ export default function App() {
           <br />
           {LADDER_DISCLAIMER_LINES[1]}
         </p>
+        <p className="site-footer__note site-footer__affiliate">
+          이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+        </p>
       </footer>
 
       {methodOpen && (
@@ -425,10 +428,7 @@ function BrandEntry({
   species: Species
 }) {
   const spec = resolveBrandSpec(entry, species)
-  const kind = species === 'cat' ? '고양이 사료' : '강아지 사료'
-  const href =
-    spec?.coupangUrl ??
-    `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} ${kind}`)}`
+  const href = `/api/coupang/buy?brand=${encodeURIComponent(entry.brand)}&species=${species}`
   const review = adaptCopyForSpecies(
     spec?.reviewNote || spec?.summary || '',
     species,

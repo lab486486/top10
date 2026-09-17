@@ -1212,6 +1212,10 @@ button {
   line-height: 1.55;
 }
 
+.site-footer__affiliate {
+  margin-top: 0.85rem;
+}
+
 .empty {
   padding: 2rem 1.2rem;
   border: 2px dashed var(--ink);
