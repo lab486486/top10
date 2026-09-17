@@ -42,14 +42,14 @@ npx decap-server
 Cloudflare Pages에는 Netlify Identity가 **없습니다**.  
 `api.netlify.com/auth` 로 가면 **Not Found** 가 정상입니다.
 
-이 저장소는 Pages Functions(`/auth`, `/callback`)로 GitHub OAuth를 처리합니다.
+이 저장소는 Pages Functions(`/api/oauth/auth`, `/api/oauth/callback`)로 GitHub OAuth를 처리합니다.
 
 1. **GitHub OAuth App 생성**
    - GitHub → Settings → Developer settings → OAuth Apps → New
    - Application name: `PETFOOD Decap` (자유)
    - Homepage URL: `https://top10-4ri.pages.dev` (또는 커스텀 도메인)
-   - Authorization callback URL: `https://top10-4ri.pages.dev/callback`  
-     (커스텀 도메인을 쓰면 그 도메인의 `/callback` 도 추가)
+   - Authorization callback URL: `https://top10-4ri.pages.dev/api/oauth/callback`  
+     (커스텀 도메인을 쓰면 그 도메인의 `/api/oauth/callback` 도 추가)
    - Client ID / Client Secret 발급
 
 2. **Cloudflare Pages 환경변수**
@@ -61,9 +61,9 @@ Cloudflare Pages에는 Netlify Identity가 **없습니다**.
      또는 `main`에 커밋 푸시. **변수만 저장하고 재배포하지 않으면 Functions에 안 보입니다.**
 
 3. **확인**
-   - `https://top10-4ri.pages.dev/auth` 접속 시 GitHub로 리다이렉트되면 OK  
+   - `https://top10-4ri.pages.dev/api/oauth/auth` 접속 시 GitHub로 리다이렉트되면 OK  
      (`GITHUB_CLIENT_ID 환경변수가…` 문구가 나오면 아직 미반영)
-   - `/admin` → Login with GitHub → 팝업이 **같은 도메인** `/auth` 로 열려야 함
+   - `/admin` → Login with GitHub → 팝업이 **같은 도메인** `/api/oauth/auth` 로 열려야 함
    - 로그인 GitHub 계정은 `lab486486/top10` **push 권한** 필요
 
 로컬 글쓰기(`npx decap-server`)는 OAuth 없이 가능합니다.

@@ -1,3 +1,3 @@
 # Cloudflare Pages — SPA fallback
-# /auth, /callback 은 Pages Functions가 우선 처리합니다.
+# /api/oauth/* 은 Pages Functions가 우선 처리합니다.
 /*    /index.html   200

@@ -44,7 +44,7 @@
             repo: 'lab486486/top10',
             branch: 'main',
             base_url: window.location.origin,
-            auth_endpoint: 'auth',
+            auth_endpoint: 'api/oauth/auth',
           },
           logo_url: '/petfood-mark.png',
         },
@@ -80,7 +80,7 @@
             ),
             h(
               'div',
-              { className: 'preview-article__layout' },
+              { className: 'preview-article__layout preview-article__layout--solo' },
               h(
                 'div',
                 { className: 'preview-article__body' },
@@ -91,17 +91,6 @@
                     alt: '',
                   }),
                 this.props.widgetFor('body'),
-              ),
-              h(
-                'aside',
-                { className: 'preview-article__aside' },
-                h(
-                  'div',
-                  { className: 'preview-article__aside-inner' },
-                  h('strong', {}, '이 글'),
-                  dateLabel && h('p', {}, dateLabel),
-                  summary && h('p', { className: 'muted' }, summary),
-                ),
               ),
             ),
           )

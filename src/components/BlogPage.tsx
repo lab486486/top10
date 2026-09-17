@@ -61,7 +61,6 @@ export function BlogList({ onOpen }: { onOpen: (slug: string) => void }) {
 export function BlogArticle({
   post,
   onBack,
-  onOpen,
 }: {
   post: BlogPost
   onBack: () => void
@@ -69,7 +68,6 @@ export function BlogArticle({
 }) {
   const toc = extractToc(post.body)
   const html = injectHeadingIds(marked.parse(post.body) as string, toc)
-  const others = blogPosts.filter((p) => p.slug !== post.slug).slice(0, 4)
 
   return (
     <article className="blog-article" id="blog">
@@ -82,14 +80,20 @@ export function BlogArticle({
         {post.summary && <p>{post.summary}</p>}
       </header>
 
-      <div className="blog-article__layout">
+      <div
+        className={
+          toc.length > 0
+            ? 'blog-article__layout'
+            : 'blog-article__layout blog-article__layout--solo'
+        }
+      >
         <div
           className="blog-article__body"
           dangerouslySetInnerHTML={{ __html: html }}
         />
-        <aside className="blog-article__aside" aria-label="글 안내">
-          <div className="blog-article__aside-inner">
-            {toc.length > 0 && (
+        {toc.length > 0 && (
+          <aside className="blog-article__aside" aria-label="목차">
+            <div className="blog-article__aside-inner">
               <div className="blog-aside-block">
                 <strong className="blog-aside-block__title">목차</strong>
                 <ol className="blog-aside-toc">
@@ -100,38 +104,9 @@ export function BlogArticle({
                   ))}
                 </ol>
               </div>
-            )}
-            <div className="blog-aside-block">
-              <strong className="blog-aside-block__title">이 글</strong>
-              <p className="blog-aside-meta">
-                <time dateTime={post.date}>{formatDate(post.date)}</time>
-              </p>
-              {post.summary && <p className="blog-aside-summary">{post.summary}</p>}
             </div>
-            {others.length > 0 && (
-              <div className="blog-aside-block">
-                <strong className="blog-aside-block__title">다른 글</strong>
-                <ul className="blog-aside-related">
-                  {others.map((p) => (
-                    <li key={p.slug}>
-                      {onOpen ? (
-                        <button
-                          type="button"
-                          className="blog-aside-related__btn"
-                          onClick={() => onOpen(p.slug)}
-                        >
-                          {p.title}
-                        </button>
-                      ) : (
-                        <a href={`/blog/${p.slug}`}>{p.title}</a>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </aside>
+          </aside>
+        )}
       </div>
     </article>
   )

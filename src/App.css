@@ -920,6 +920,14 @@ button {
   align-items: start;
 }
 
+.blog-article__layout--solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.blog-article__layout--solo .blog-article__body {
+  padding-right: 0;
+}
+
 .blog-article__body {
   min-width: 0;
   padding-right: 1.35rem;

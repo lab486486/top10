@@ -157,7 +157,6 @@ export default function App() {
             <BlogArticle
               post={activePost}
               onBack={() => navigate('/blog')}
-              onOpen={(slug) => navigate(`/blog/${slug}`)}
             />
           ) : (
             <BlogList onOpen={(slug) => navigate(`/blog/${slug}`)} />
