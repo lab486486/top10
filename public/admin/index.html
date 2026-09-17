@@ -21,39 +21,34 @@
         background: #f4f7f2;
       }
 
-      /* 로그인 화면 로고 크기 정리 */
       img[alt='Logo'] {
         max-width: 120px !important;
         height: auto !important;
         object-fit: contain;
       }
 
-      /* 목록: 제목 왼쪽 · 날짜 오른쪽 */
-      .pf-entry-summary {
-        display: flex !important;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 1rem;
+      /* 목록 카드: 제목 왼쪽 / 작성시각 오른쪽 (제목 문자열과 분리) */
+      .pf-entry-row {
+        position: relative !important;
+        display: block !important;
         width: 100%;
-        font-weight: 700;
+        padding-right: 9.5rem !important;
+        box-sizing: border-box;
       }
 
-      .pf-entry-summary__title {
-        flex: 1 1 auto;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .pf-entry-summary__date {
-        flex: 0 0 auto;
+      .pf-entry-row .pf-entry-date {
+        position: absolute !important;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: 0 !important;
         font-variant-numeric: tabular-nums;
         font-weight: 600;
-        font-size: 0.92em;
+        font-size: 0.86rem;
         color: #5b6b62;
         white-space: nowrap;
         text-align: right;
+        pointer-events: none;
       }
 
       /* 글쓰기: 미리보기 없이 2열(제목|날짜, 설명|커버) */
@@ -72,22 +67,38 @@
         .pf-editor-grid {
           grid-template-columns: 1fr;
         }
+
+        .pf-entry-row {
+          padding-right: 0 !important;
+        }
+
+        .pf-entry-row .pf-entry-date {
+          position: static !important;
+          transform: none;
+          display: block;
+          margin-top: 0.25rem !important;
+          text-align: left;
+        }
       }
     </style>
     <script>
-      // config.yml 로드 후 backend.base_url 을 현재 도메인으로 덮어쓰기 위해 수동 초기화
       window.CMS_MANUAL_INIT = true
     </script>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     <script>
+      var REPO = 'lab486486/top10'
+      var BLOG_FOLDER = 'content/blog'
+      var dateCache = Object.create(null)
+      var dateInflight = Object.create(null)
+
       CMS.init({
         config: {
           load_config_file: true,
           backend: {
             name: 'github',
-            repo: 'lab486486/top10',
+            repo: REPO,
             branch: 'main',
             base_url: window.location.origin,
             auth_endpoint: 'api/oauth/auth',
@@ -99,9 +110,9 @@
         },
       })
 
-      function formatFallbackDate(raw) {
-        var d = new Date(raw)
-        if (Number.isNaN(d.getTime())) return String(raw || '').trim()
+      function formatStamp(iso) {
+        var d = new Date(iso)
+        if (Number.isNaN(d.getTime())) return ''
         var y = d.getFullYear()
         var m = String(d.getMonth() + 1).padStart(2, '0')
         var day = String(d.getDate()).padStart(2, '0')
@@ -110,32 +121,104 @@
         return y + '-' + m + '-' + day + ' ' + hh + ':' + mm
       }
 
-      function splitEntrySummaries(root) {
-        var nodes = (root || document).querySelectorAll('h2, h1, a, span, div, p')
-        nodes.forEach(function (el) {
-          if (el.dataset.pfSplit === '1') return
-          if (el.children.length > 0) return
-          var text = (el.textContent || '').trim()
-          if (text.indexOf('|||') === -1) return
-          var parts = text.split('|||')
-          if (parts.length < 2) return
-          var title = parts[0].trim()
-          var datePart = parts.slice(1).join('|||').trim()
-          // date filter 실패 시 JS Date 문자열이 올 수 있음
-          if (/GMT|한국 표준시|Standard Time/i.test(datePart) || /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s/.test(datePart)) {
-            datePart = formatFallbackDate(datePart)
+      function authHeaders() {
+        var headers = { Accept: 'application/vnd.github+json' }
+        try {
+          for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i)
+            if (!key || !/decap|netlify-cms/i.test(key)) continue
+            var raw = localStorage.getItem(key)
+            if (!raw) continue
+            var parsed = JSON.parse(raw)
+            var token =
+              parsed &&
+              (parsed.token ||
+                (parsed.value && parsed.value.token) ||
+                (parsed.data && parsed.data.token))
+            if (token) {
+              headers.Authorization = 'Bearer ' + token
+              break
+            }
           }
-          el.dataset.pfSplit = '1'
-          el.classList.add('pf-entry-summary')
-          el.textContent = ''
-          var t = document.createElement('span')
-          t.className = 'pf-entry-summary__title'
-          t.textContent = title
-          var d = document.createElement('span')
-          d.className = 'pf-entry-summary__date'
-          d.textContent = datePart
-          el.appendChild(t)
-          el.appendChild(d)
+        } catch (e) {}
+        return headers
+      }
+
+      function fetchFileWrittenAt(slug) {
+        if (dateCache[slug]) return Promise.resolve(dateCache[slug])
+        if (dateInflight[slug]) return dateInflight[slug]
+
+        var path = BLOG_FOLDER + '/' + slug + '.md'
+        var url =
+          'https://api.github.com/repos/' +
+          REPO +
+          '/commits?path=' +
+          encodeURIComponent(path) +
+          '&per_page=1'
+
+        dateInflight[slug] = fetch(url, { headers: authHeaders() })
+          .then(function (res) {
+            if (!res.ok) throw new Error('commits ' + res.status)
+            return res.json()
+          })
+          .then(function (rows) {
+            var iso =
+              (rows &&
+                rows[0] &&
+                rows[0].commit &&
+                ((rows[0].commit.author && rows[0].commit.author.date) ||
+                  (rows[0].commit.committer && rows[0].commit.committer.date))) ||
+              ''
+            dateCache[slug] = formatStamp(iso) || ''
+            return dateCache[slug]
+          })
+          .catch(function () {
+            dateCache[slug] = ''
+            return ''
+          })
+          .finally(function () {
+            delete dateInflight[slug]
+          })
+
+        return dateInflight[slug]
+      }
+
+      function entrySlugFromHref(href) {
+        if (!href) return ''
+        var m = String(href).match(/collections\/blog\/entries\/([^/?#]+)/i)
+        return m ? decodeURIComponent(m[1]) : ''
+      }
+
+      function enhanceEntryCards() {
+        var links = document.querySelectorAll('a[href*="collections/blog/entries/"]')
+        links.forEach(function (link) {
+          var slug = entrySlugFromHref(link.getAttribute('href'))
+          if (!slug) return
+
+          // 카드 행 컨테이너: 링크 자체 또는 가까운 카드 래퍼
+          var row = link
+          row.classList.add('pf-entry-row')
+
+          var dateEl = row.querySelector(':scope > .pf-entry-date')
+          if (!dateEl) {
+            dateEl = document.createElement('span')
+            dateEl.className = 'pf-entry-date'
+            dateEl.setAttribute('aria-label', '작성 시각')
+            row.appendChild(dateEl)
+          }
+
+          if (dateCache[slug]) {
+            dateEl.textContent = dateCache[slug]
+            return
+          }
+
+          if (dateEl.dataset.pfLoading === '1') return
+          dateEl.dataset.pfLoading = '1'
+          dateEl.textContent = ''
+          fetchFileWrittenAt(slug).then(function (stamp) {
+            dateEl.dataset.pfLoading = '0'
+            if (stamp) dateEl.textContent = stamp
+          })
         })
       }
 
@@ -144,20 +227,17 @@
         return label ? (label.textContent || '').trim() : ''
       }
 
-      function enhanceEditorLayout(root) {
-        var panes = (root || document).querySelectorAll('[class*="ControlPane"]')
+      function enhanceEditorLayout() {
+        var panes = document.querySelectorAll('[class*="ControlPane"]')
         panes.forEach(function (pane) {
           if (pane.dataset.pfGrid === '1') return
           var kids = Array.prototype.slice.call(pane.children).filter(function (el) {
             return el.nodeType === 1 && fieldLabelText(el)
           })
           if (kids.length < 4) return
-
           var labels = kids.map(fieldLabelText)
-          // 제목·날짜·설명·커버 이미지가 앞에 있을 때만 2열 그리드 적용
           if (labels[0].indexOf('제목') === -1 || labels[1].indexOf('날짜') === -1) return
           if (labels[2].indexOf('설명') === -1 || labels[3].indexOf('커버') === -1) return
-
           pane.dataset.pfGrid = '1'
           pane.classList.add('pf-editor-grid')
           kids.forEach(function (el, i) {
@@ -167,8 +247,8 @@
       }
 
       function tick() {
-        splitEntrySummaries(document)
-        enhanceEditorLayout(document)
+        enhanceEntryCards()
+        enhanceEditorLayout()
       }
 
       tick()
