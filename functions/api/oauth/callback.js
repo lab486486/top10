@@ -78,13 +78,28 @@ export async function onRequestGet(context) {
   const expected = cookie.match(/decap_oauth_state=([^;]+)/)?.[1]
 
   if (error) {
-    const msg = JSON.stringify(`authorization:github:error:${error}`)
+    // Decap handshake: wait for authorizing:github, then reply with error payload
+    const errPayload = JSON.stringify(JSON.stringify(error))
     return new Response(
       htmlPage(`
         (function () {
-          const msg = ${msg};
-          if (window.opener) { window.opener.postMessage(msg, '*'); window.close(); }
-          else { document.body.textContent = msg; }
+          function receiveMessage(e) {
+            if (e.data !== 'authorizing:github') return;
+            window.removeEventListener('message', receiveMessage, false);
+            const msg = 'authorization:github:error:' + ${errPayload};
+            if (window.opener) {
+              window.opener.postMessage(msg, e.origin);
+              window.close();
+            } else {
+              document.body.textContent = msg;
+            }
+          }
+          window.addEventListener('message', receiveMessage, false);
+          if (window.opener) {
+            window.opener.postMessage('authorizing:github', '*');
+          } else {
+            document.body.textContent = 'authorization:github:error:' + ${errPayload};
+          }
         })();
       `),
       { headers: { 'content-type': 'text/html; charset=utf-8' } },
@@ -118,19 +133,38 @@ export async function onRequestGet(context) {
   const tokenJson = await tokenRes.json()
   if (!tokenRes.ok || !tokenJson.access_token) {
     const detail = tokenJson.error_description || tokenJson.error || 'token exchange failed'
-    const msg = JSON.stringify(`authorization:github:error:${detail}`)
+    const errPayload = JSON.stringify(JSON.stringify(detail))
     return new Response(
       htmlPage(`
         (function () {
-          const msg = ${msg};
-          if (window.opener) { window.opener.postMessage(msg, '*'); window.close(); }
-          else { document.body.textContent = msg; }
+          function receiveMessage(e) {
+            if (e.data !== 'authorizing:github') return;
+            window.removeEventListener('message', receiveMessage, false);
+            const msg = 'authorization:github:error:' + ${errPayload};
+            if (window.opener) {
+              window.opener.postMessage(msg, e.origin);
+              window.close();
+            } else {
+              document.body.textContent = msg;
+            }
+          }
+          window.addEventListener('message', receiveMessage, false);
+          if (window.opener) {
+            window.opener.postMessage('authorizing:github', '*');
+          } else {
+            document.body.textContent = 'authorization:github:error:' + ${errPayload};
+          }
         })();
       `),
       { status: 400, headers: { 'content-type': 'text/html; charset=utf-8' } },
     )
   }
 
+  // Decap expects a 2-step postMessage handshake:
+  // 1) popup → opener: "authorizing:github"
+  // 2) opener → popup: "authorizing:github"
+  // 3) popup → opener: "authorization:github:success:{token,provider}"
+  // Immediate success+close (previous behavior) is ignored by Decap.
   const payload = JSON.stringify({
     token: tokenJson.access_token,
     provider: 'github',
@@ -139,10 +173,21 @@ export async function onRequestGet(context) {
   return new Response(
     htmlPage(`
       (function () {
-        const msg = 'authorization:github:success:' + ${JSON.stringify(payload)};
+        const data = ${JSON.stringify(payload)};
+        function receiveMessage(e) {
+          if (e.data !== 'authorizing:github') return;
+          window.removeEventListener('message', receiveMessage, false);
+          const msg = 'authorization:github:success:' + data;
+          if (window.opener) {
+            window.opener.postMessage(msg, e.origin);
+            window.close();
+          } else {
+            document.body.textContent = '로그인 완료. 이 창을 닫고 관리자 페이지로 돌아가 주세요.';
+          }
+        }
+        window.addEventListener('message', receiveMessage, false);
         if (window.opener) {
-          window.opener.postMessage(msg, window.location.origin);
-          window.close();
+          window.opener.postMessage('authorizing:github', '*');
         } else {
           document.body.textContent = '로그인 완료. 이 창을 닫고 관리자 페이지로 돌아가 주세요.';
         }
