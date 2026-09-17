@@ -154,7 +154,11 @@ export default function App() {
               </button>
             </section>
           ) : activePost ? (
-            <BlogArticle post={activePost} onBack={() => navigate('/blog')} />
+            <BlogArticle
+              post={activePost}
+              onBack={() => navigate('/blog')}
+              onOpen={(slug) => navigate(`/blog/${slug}`)}
+            />
           ) : (
             <BlogList onOpen={(slug) => navigate(`/blog/${slug}`)} />
           )}
@@ -261,8 +265,8 @@ export default function App() {
 
       <section className="situations" id="situations">
         <div className="situations__inner">
-          <h2>상황별로는 이렇게</h2>
-          <p>윗등급이 모든 아이에게 최선은 아닙니다.</p>
+          <h2>사료 고르기가 힘들다면?</h2>
+          <p>등급별로 고르기보다는 상황에 맞게 골라보세요!</p>
           <ul>
             {situations.map((s) => (
               <li key={s.title}>
@@ -410,33 +414,23 @@ function BrandEntry({
             className="brand-card__emojis brand-card__emojis--locked"
             aria-label="함량 공개 거부"
           >
-            <span title="고기 함량">
-              <span aria-hidden="true">🍖</span>
-              <span className="brand-card__stat">:—</span>
-            </span>
-            <span title="조단백">
-              <span aria-hidden="true">🥛</span>
-              <span className="brand-card__stat">:—</span>
-            </span>
-            <span title="알 크기">
-              <span aria-hidden="true">⚪</span>
-              <span className="brand-card__stat">:—</span>
-            </span>
+            <MetricStat emoji="🍖" label="고기" value="—" />
+            <MetricStat emoji="🥛" label="단백" value="—" />
+            <MetricStat emoji="⚪" label="키블" value="—" />
           </div>
         ) : (
           <div className="brand-card__emojis" aria-label="핵심 스펙">
-            <span title="고기 함량">
-              <span aria-hidden="true">🍖</span>
-              <span className="brand-card__stat">:{spec.meatPercent}</span>
-            </span>
-            <span title="조단백">
-              <span aria-hidden="true">🥛</span>
-              <span className="brand-card__stat">:{spec.proteinPercent}</span>
-            </span>
-            <span title="알 크기(mm)">
-              <span aria-hidden="true">⚪</span>
-              <span className="brand-card__stat">:{spec.kibbleSizeMm}mm</span>
-            </span>
+            <MetricStat emoji="🍖" label="고기" value={String(spec.meatPercent)} />
+            <MetricStat
+              emoji="🥛"
+              label="단백"
+              value={String(spec.proteinPercent)}
+            />
+            <MetricStat
+              emoji="⚪"
+              label="키블"
+              value={`${spec.kibbleSizeMm}mm`}
+            />
           </div>
         ))}
 
@@ -448,5 +442,27 @@ function BrandEntry({
         </ul>
       )}
     </li>
+  )
+}
+
+function MetricStat({
+  emoji,
+  label,
+  value,
+}: {
+  emoji: string
+  label: string
+  value: string
+}) {
+  return (
+    <span className="brand-card__metric" title={`${label} ${value}`}>
+      <span className="brand-card__metric-emoji" aria-hidden="true">
+        {emoji}
+      </span>
+      <span className="brand-card__metric-copy">
+        <span className="brand-card__metric-label">{label}</span>
+        <span className="brand-card__metric-value">{value}</span>
+      </span>
+    </span>
   )
 }

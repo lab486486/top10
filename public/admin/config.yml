@@ -11,9 +11,16 @@ local_backend: true
 
 site_url: /
 logo_url: /favicon.svg
+display_url: /blog
+show_preview_links: true
 
 media_folder: public/uploads
 public_folder: /uploads
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: '-'
 
 collections:
   - name: blog
@@ -24,9 +31,51 @@ collections:
     slug: '{{slug}}'
     extension: md
     format: frontmatter
+    preview_path: 'blog/{{slug}}'
+    summary: '{{title}} — {{date | date("YYYY.MM.DD")}}'
+    sortable_fields: ['date', 'title', 'commit_date']
+    view_filters:
+      - label: 초안만
+        field: draft
+        pattern: true
     fields:
-      - { label: 제목, name: title, widget: string }
-      - { label: 요약, name: summary, widget: text, required: false }
-      - { label: 발행일, name: date, widget: datetime }
-      - { label: 초안, name: draft, widget: boolean, default: false, required: false }
-      - { label: 본문, name: body, widget: markdown }
+      - label: 제목
+        name: title
+        widget: string
+        hint: 목록·미리보기에 크게 노출됩니다.
+      - label: 요약
+        name: summary
+        widget: text
+        required: false
+        hint: 카드·사이드바에 짧게 보여 줄 한두 문장
+      - label: 발행일
+        name: date
+        widget: datetime
+        date_format: YYYY-MM-DD
+        time_format: HH:mm
+      - label: 초안
+        name: draft
+        widget: boolean
+        default: false
+        required: false
+        hint: 켜 두면 사이트에 공개되지 않습니다.
+      - label: 대표 이미지
+        name: thumbnail
+        widget: image
+        required: false
+        hint: 선택 사항. 본문에도 이미지를 넣을 수 있습니다.
+      - label: 본문
+        name: body
+        widget: markdown
+        hint: 제목(##)·목록·이미지를 활용해 작성하세요. 오른쪽 미리보기로 확인합니다.
+        buttons:
+          - bold
+          - italic
+          - code
+          - link
+          - heading-two
+          - heading-three
+          - quote
+          - bulleted-list
+          - numbered-list
+          - image

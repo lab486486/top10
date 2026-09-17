@@ -4,10 +4,86 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>PETFOOD · 콘텐츠 관리</title>
+    <title>PETFOOD · 글쓰기</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;600;700&family=Outfit:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* Decap 에디터 UI 살짝 정리 */
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+        background: #f4f7f2;
+      }
+    </style>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+    <script>
+      CMS.registerPreviewStyle('/admin/preview.css')
+
+      var PostPreview = createClass({
+        render: function () {
+          var entry = this.props.entry
+          var title = entry.getIn(['data', 'title']) || '제목 없음'
+          var summary = entry.getIn(['data', 'summary']) || ''
+          var date = entry.getIn(['data', 'date'])
+          var dateLabel = date
+            ? new Date(date).toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })
+            : ''
+          var thumb = entry.getIn(['data', 'thumbnail'])
+          var thumbUrl = thumb ? this.props.getAsset(thumb) : null
+
+          return h(
+            'article',
+            { className: 'preview-article' },
+            h(
+              'header',
+              { className: 'preview-article__head' },
+              dateLabel && h('time', {}, dateLabel),
+              h('h1', {}, title),
+              summary && h('p', { className: 'preview-article__summary' }, summary),
+            ),
+            h(
+              'div',
+              { className: 'preview-article__layout' },
+              h(
+                'div',
+                { className: 'preview-article__body' },
+                thumbUrl &&
+                  h('img', {
+                    className: 'preview-article__thumb',
+                    src: thumbUrl.toString(),
+                    alt: '',
+                  }),
+                this.props.widgetFor('body'),
+              ),
+              h(
+                'aside',
+                { className: 'preview-article__aside' },
+                h(
+                  'div',
+                  { className: 'preview-article__aside-inner' },
+                  h('strong', {}, '이 글'),
+                  dateLabel && h('p', {}, dateLabel),
+                  summary && h('p', { className: 'muted' }, summary),
+                ),
+              ),
+            ),
+          )
+        },
+      })
+
+      CMS.registerPreviewTemplate('blog', PostPreview)
+    </script>
   </body>
 </html>
