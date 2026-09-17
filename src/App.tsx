@@ -386,56 +386,63 @@ function BrandEntry({
         </div>
       </div>
 
-      {spec ? (
-        <>
-          {spec.disclosure === 'refused' ? (
-            <div
-              className="brand-card__emojis brand-card__emojis--locked"
-              aria-label="함량 공개 거부"
-            >
-              <span title="고기 함량">
-                <span aria-hidden="true">🍖</span>
-                <span className="brand-card__stat">:—</span>
-              </span>
-              <span title="조단백">
-                <span aria-hidden="true">🥛</span>
-                <span className="brand-card__stat">:—</span>
-              </span>
-              <span title="알 크기">
-                <span aria-hidden="true">⚪</span>
-                <span className="brand-card__stat">:—</span>
-              </span>
+      <div className="brand-card__body">
+        {spec ? (
+          <>
+            {review && <p className="brand-card__summary">{review}</p>}
+            {spec.disclosure === 'refused' && (
               <em className="brand-card__lock">함량 공개 거부</em>
-            </div>
-          ) : (
-            <div className="brand-card__emojis" aria-label="핵심 스펙">
-              <span title="고기 함량">
-                <span aria-hidden="true">🍖</span>
-                <span className="brand-card__stat">:{spec.meatPercent}</span>
-              </span>
-              <span title="조단백">
-                <span aria-hidden="true">🥛</span>
-                <span className="brand-card__stat">:{spec.proteinPercent}</span>
-              </span>
-              <span title="알 크기(mm)">
-                <span aria-hidden="true">⚪</span>
-                <span className="brand-card__stat">:{spec.kibbleSizeMm}mm</span>
-              </span>
-            </div>
-          )}
-          {review && <p className="brand-card__summary">{review}</p>}
-          {spec.tags.length > 0 && (
-            <ul className="brand-card__tags">
-              {spec.tags.map((tag) => (
-                <li key={tag}>{tag}</li>
-              ))}
-            </ul>
-          )}
-        </>
-      ) : (
-        <p className="brand-card__empty-spec">
-          성분·후기 데이터 미조사 · 구매에서 최신 함량을 확인하세요
-        </p>
+            )}
+          </>
+        ) : (
+          <p className="brand-card__empty-spec">
+            성분·후기 데이터 미조사 · 구매에서 최신 함량을 확인하세요
+          </p>
+        )}
+      </div>
+
+      {spec &&
+        (spec.disclosure === 'refused' ? (
+          <div
+            className="brand-card__emojis brand-card__emojis--locked"
+            aria-label="함량 공개 거부"
+          >
+            <span title="고기 함량">
+              <span aria-hidden="true">🍖</span>
+              <span className="brand-card__stat">:—</span>
+            </span>
+            <span title="조단백">
+              <span aria-hidden="true">🥛</span>
+              <span className="brand-card__stat">:—</span>
+            </span>
+            <span title="알 크기">
+              <span aria-hidden="true">⚪</span>
+              <span className="brand-card__stat">:—</span>
+            </span>
+          </div>
+        ) : (
+          <div className="brand-card__emojis" aria-label="핵심 스펙">
+            <span title="고기 함량">
+              <span aria-hidden="true">🍖</span>
+              <span className="brand-card__stat">:{spec.meatPercent}</span>
+            </span>
+            <span title="조단백">
+              <span aria-hidden="true">🥛</span>
+              <span className="brand-card__stat">:{spec.proteinPercent}</span>
+            </span>
+            <span title="알 크기(mm)">
+              <span aria-hidden="true">⚪</span>
+              <span className="brand-card__stat">:{spec.kibbleSizeMm}mm</span>
+            </span>
+          </div>
+        ))}
+
+      {spec && spec.tags.length > 0 && (
+        <ul className="brand-card__tags">
+          {spec.tags.map((tag) => (
+            <li key={tag}>{tag}</li>
+          ))}
+        </ul>
       )}
     </li>
   )

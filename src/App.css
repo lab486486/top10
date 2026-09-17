@@ -565,11 +565,24 @@ button {
 }
 
 .brand-card {
-  display: grid;
-  gap: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  height: 100%;
   padding: 0.9rem 0.95rem;
   border: 2px solid var(--ink);
   background: #fff;
+}
+
+.brand-card__body {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-height: 5.4rem;
+  padding: 0.65rem 0.7rem;
+  border: 1.5px dashed var(--line);
+  background: #fbfcf9;
 }
 
 .brand-card__top {
@@ -646,6 +659,7 @@ button {
   flex-wrap: wrap;
   align-items: baseline;
   gap: 0.45rem 1.1rem;
+  margin-top: auto;
   font-family: var(--metric);
   font-size: 1.02rem;
   font-weight: 500;
@@ -684,6 +698,7 @@ button {
 
 .brand-card__lock {
   margin: 0;
+  align-self: flex-start;
   font-family: var(--body);
   font-style: normal;
   font-size: 0.72rem;
@@ -722,12 +737,10 @@ button {
 
 .brand-card__empty-spec {
   margin: 0;
-  padding: 0.55rem 0.65rem;
-  border: 1.5px dashed var(--line);
   color: var(--ink-soft);
   font-size: 0.75rem;
   font-weight: 600;
-  background: #fbfcf9;
+  line-height: 1.45;
 }
 
 .situations {
