@@ -1482,6 +1482,57 @@ button {
     border-right: 0;
     border-bottom: 2px solid var(--ink);
   }
+
+  .back-top {
+    display: grid;
+  }
+
+  .back-top.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+}
+
+.back-top {
+  display: none;
+  position: fixed;
+  right: max(0.9rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 60;
+  width: 3.15rem;
+  height: 3.15rem;
+  place-items: center;
+  align-content: center;
+  gap: 0.05rem;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: rgba(247, 250, 244, 0.94);
+  color: var(--ink);
+  box-shadow: 0 8px 20px rgba(10, 31, 24, 0.18);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  cursor: pointer;
+  padding: 0;
+}
+
+.back-top__arrow {
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.back-top__label {
+  font-family: var(--metric);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1491,7 +1542,8 @@ button {
 
   .hero__center,
   .toc__item,
-  .brand-card__buy {
+  .brand-card__buy,
+  .back-top {
     animation: none;
     transition: none;
   }

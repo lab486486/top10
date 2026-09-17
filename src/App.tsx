@@ -27,6 +27,7 @@ export default function App() {
   const [navSpecies, setNavSpecies] = useState<Species | null>(null)
   const [methodOpen, setMethodOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showBackTop, setShowBackTop] = useState(false)
   const [path, setPath] = useState(readPath)
   const [scrollToGrades, setScrollToGrades] = useState(false)
 
@@ -84,6 +85,15 @@ export default function App() {
   }, [path])
 
   useEffect(() => {
+    const onScroll = () => {
+      setShowBackTop(window.scrollY > 320)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
     if (!scrollToGrades || isBlog) return
     setScrollToGrades(false)
     const toc = document.getElementById('grade-toc')
@@ -100,6 +110,10 @@ export default function App() {
     setMenuOpen(false)
     navigate('/')
     setScrollToGrades(true)
+  }
+
+  const goTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -385,6 +399,18 @@ export default function App() {
           </div>
         </div>
       )}
+
+      <button
+        type="button"
+        className={showBackTop ? 'back-top is-visible' : 'back-top'}
+        aria-label="맨 위로"
+        onClick={goTop}
+      >
+        <span className="back-top__arrow" aria-hidden="true">
+          ↑
+        </span>
+        <span className="back-top__label">TOP</span>
+      </button>
     </div>
   )
 }
