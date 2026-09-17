@@ -33,8 +33,7 @@ collections:
     extension: md
     format: frontmatter
     preview_path: 'blog/{{slug}}'
-    # ||| 구분자는 admin/index.html 에서 제목(좌) · 날짜(우)로 나눕니다.
-    summary: "{{title}}|||{{date | date('YYYY-MM-DD HH:mm')}}"
+    summary: '{{title}}'
     sortable_fields: ['date', 'title', 'commit_date']
     editor:
       preview: false
