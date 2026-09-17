@@ -27,6 +27,52 @@
         height: auto !important;
         object-fit: contain;
       }
+
+      /* 목록: 제목 왼쪽 · 날짜 오른쪽 */
+      .pf-entry-summary {
+        display: flex !important;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        width: 100%;
+        font-weight: 700;
+      }
+
+      .pf-entry-summary__title {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .pf-entry-summary__date {
+        flex: 0 0 auto;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        font-size: 0.92em;
+        color: #5b6b62;
+        white-space: nowrap;
+        text-align: right;
+      }
+
+      /* 글쓰기: 미리보기 없이 2열(제목|날짜, 설명|커버) */
+      .pf-editor-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 1.25rem;
+        align-items: start;
+      }
+
+      .pf-editor-grid > .pf-span-2 {
+        grid-column: 1 / -1;
+      }
+
+      @media (max-width: 860px) {
+        .pf-editor-grid {
+          grid-template-columns: 1fr;
+        }
+      }
     </style>
     <script>
       // config.yml 로드 후 backend.base_url 을 현재 도메인으로 덮어쓰기 위해 수동 초기화
@@ -49,57 +95,87 @@
           site_url: 'https://petfood.pe.kr',
           display_url: 'https://petfood.pe.kr/blog',
           logo_url: '/petfood-mark.png',
+          show_preview_links: false,
         },
       })
 
-      CMS.registerPreviewStyle('/admin/preview.css')
+      function formatFallbackDate(raw) {
+        var d = new Date(raw)
+        if (Number.isNaN(d.getTime())) return String(raw || '').trim()
+        var y = d.getFullYear()
+        var m = String(d.getMonth() + 1).padStart(2, '0')
+        var day = String(d.getDate()).padStart(2, '0')
+        var hh = String(d.getHours()).padStart(2, '0')
+        var mm = String(d.getMinutes()).padStart(2, '0')
+        return y + '-' + m + '-' + day + ' ' + hh + ':' + mm
+      }
 
-      var PostPreview = createClass({
-        render: function () {
-          var entry = this.props.entry
-          var title = entry.getIn(['data', 'title']) || '제목 없음'
-          var summary = entry.getIn(['data', 'summary']) || ''
-          var date = entry.getIn(['data', 'date'])
-          var dateLabel = date
-            ? new Date(date).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })
-            : ''
-          var thumb = entry.getIn(['data', 'thumbnail'])
-          var thumbUrl = thumb ? this.props.getAsset(thumb) : null
+      function splitEntrySummaries(root) {
+        var nodes = (root || document).querySelectorAll('h2, h1, a, span, div, p')
+        nodes.forEach(function (el) {
+          if (el.dataset.pfSplit === '1') return
+          if (el.children.length > 0) return
+          var text = (el.textContent || '').trim()
+          if (text.indexOf('|||') === -1) return
+          var parts = text.split('|||')
+          if (parts.length < 2) return
+          var title = parts[0].trim()
+          var datePart = parts.slice(1).join('|||').trim()
+          // date filter 실패 시 JS Date 문자열이 올 수 있음
+          if (/GMT|한국 표준시|Standard Time/i.test(datePart) || /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\s/.test(datePart)) {
+            datePart = formatFallbackDate(datePart)
+          }
+          el.dataset.pfSplit = '1'
+          el.classList.add('pf-entry-summary')
+          el.textContent = ''
+          var t = document.createElement('span')
+          t.className = 'pf-entry-summary__title'
+          t.textContent = title
+          var d = document.createElement('span')
+          d.className = 'pf-entry-summary__date'
+          d.textContent = datePart
+          el.appendChild(t)
+          el.appendChild(d)
+        })
+      }
 
-          return h(
-            'article',
-            { className: 'preview-article' },
-            h(
-              'header',
-              { className: 'preview-article__head' },
-              dateLabel && h('time', {}, dateLabel),
-              h('h1', {}, title),
-              summary && h('p', { className: 'preview-article__summary' }, summary),
-            ),
-            h(
-              'div',
-              { className: 'preview-article__layout preview-article__layout--solo' },
-              h(
-                'div',
-                { className: 'preview-article__body' },
-                thumbUrl &&
-                  h('img', {
-                    className: 'preview-article__thumb',
-                    src: thumbUrl.toString(),
-                    alt: '',
-                  }),
-                this.props.widgetFor('body'),
-              ),
-            ),
-          )
-        },
+      function fieldLabelText(node) {
+        var label = node.querySelector('label')
+        return label ? (label.textContent || '').trim() : ''
+      }
+
+      function enhanceEditorLayout(root) {
+        var panes = (root || document).querySelectorAll('[class*="ControlPane"]')
+        panes.forEach(function (pane) {
+          if (pane.dataset.pfGrid === '1') return
+          var kids = Array.prototype.slice.call(pane.children).filter(function (el) {
+            return el.nodeType === 1 && fieldLabelText(el)
+          })
+          if (kids.length < 4) return
+
+          var labels = kids.map(fieldLabelText)
+          // 제목·날짜·설명·커버 이미지가 앞에 있을 때만 2열 그리드 적용
+          if (labels[0].indexOf('제목') === -1 || labels[1].indexOf('날짜') === -1) return
+          if (labels[2].indexOf('설명') === -1 || labels[3].indexOf('커버') === -1) return
+
+          pane.dataset.pfGrid = '1'
+          pane.classList.add('pf-editor-grid')
+          kids.forEach(function (el, i) {
+            if (i >= 4) el.classList.add('pf-span-2')
+          })
+        })
+      }
+
+      function tick() {
+        splitEntrySummaries(document)
+        enhanceEditorLayout(document)
+      }
+
+      tick()
+      var obs = new MutationObserver(function () {
+        tick()
       })
-
-      CMS.registerPreviewTemplate('blog', PostPreview)
+      obs.observe(document.documentElement, { childList: true, subtree: true })
     </script>
   </body>
 </html>
