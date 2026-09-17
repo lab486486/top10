@@ -441,6 +441,15 @@ button {
   color: #2a2308;
 }
 
+.hero__species-label {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  line-height: 1.1;
+}
+
 .toc {
   position: sticky;
   top: 58px;
@@ -1379,13 +1388,17 @@ button {
     margin-bottom: 0.2rem;
   }
 
+  /* 카피: 선택 레일 왼쪽 선 기준 영역의 중앙 정렬 */
   .hero > .hero__center {
-    width: min(100%, calc(100% - 5.5rem));
-    margin: 0 auto 0 0.75rem;
-    padding: 0.85rem 0.75rem;
-    justify-self: start;
-    text-align: left;
-    justify-items: start;
+    --hero-rail-w: 3.6rem;
+    --hero-rail-gap: 0.65rem;
+    width: auto;
+    max-width: none;
+    justify-self: stretch;
+    margin: 0;
+    padding: 0.85rem calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0.85rem 0.75rem;
+    text-align: center;
+    justify-items: center;
   }
 
   .hero h1 {
@@ -1401,21 +1414,30 @@ button {
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
   }
 
+  /* 선택 레일: 중앙선 기준 높이 절반, 폭 80%, 세로 글자, 배경 50% */
   .hero > .hero__species {
+    --hero-rail-w: 3.6rem;
     flex-direction: column;
-    align-self: stretch;
+    align-self: center;
     justify-self: end;
-    margin: 0.65rem 0.65rem 0.65rem 0;
-    width: 4.5rem;
-    background: rgba(10, 14, 18, 0.42);
-    border-color: rgba(240, 215, 140, 0.65);
+    height: 50%;
+    width: var(--hero-rail-w);
+    margin: 0 var(--hero-rail-gap, 0.65rem) 0 0;
+    background: rgba(10, 14, 18, 0.5);
+    border-color: rgba(240, 215, 140, 0.5);
   }
 
   .hero__species button {
     flex: 1;
     min-height: 0;
-    padding: 0.55rem 0.35rem;
-    font-size: 0.78rem;
+    padding: 0.35rem 0.2rem;
+    font-size: 0.72rem;
+  }
+
+  .hero__species-label {
+    flex-direction: column;
+    gap: 0.02em;
+    letter-spacing: 0;
   }
 
   .toc__inner {
