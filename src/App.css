@@ -1397,20 +1397,19 @@ button {
     margin-bottom: 0;
   }
 
-  /* 카피: 선택 레일 왼쪽 선 기준 중앙 + 경계선 위로 올림 */
+  /* 카피: 선택 레일 왼쪽 선 기준 중앙 + 강아지 영역(경계선 위)에 배치 */
   .hero > .hero__center {
     --hero-rail-w: 3.6rem;
     --hero-rail-gap: 0.65rem;
     width: auto;
     max-width: none;
     justify-self: stretch;
-    align-self: center;
-    /* 중앙 정렬 기준에서 블록 전체를 위로 → PETFOOD·제목이 경계선 위 */
-    margin: 0 0 11vh;
-    padding: 0.5rem calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0.5rem 0.75rem;
+    align-self: start;
+    margin: 0;
+    padding: clamp(1.1rem, 4.5vh, 2rem) calc(var(--hero-rail-w) + var(--hero-rail-gap) + 0.55rem) 0.35rem 0.75rem;
     text-align: center;
     justify-items: center;
-    gap: 0.18rem;
+    gap: 0.14rem;
     animation-name: hero-in-fade;
   }
 
@@ -1428,9 +1427,9 @@ button {
   }
 
   .hero__lead {
-    margin-top: 0.06rem;
+    margin-top: 0.02rem;
     font-size: 0.9rem;
-    line-height: 1.25;
+    line-height: 1.2;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
   }
