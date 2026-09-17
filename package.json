@@ -1,11 +1,13 @@
 {
-  "name": "golrameok",
+  "name": "petfood",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generate-feeds.mjs",
     "build": "tsc -b && vite build",
+    "feeds": "node scripts/generate-feeds.mjs",
     "lint": "oxlint",
     "preview": "vite preview"
   },

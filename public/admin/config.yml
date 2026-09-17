@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: lab486486/top10
+  repo: lab486486/petfood
   branch: main
   # Cloudflare Pages Functions(/api/oauth/auth, /api/oauth/callback)를 OAuth 프록시로 사용.
   # base_url 은 admin/index.html 에서 window.location.origin 으로 덮어씁니다.
@@ -10,9 +10,9 @@ backend:
 # 운영에서는 Functions OAuth를 쓰므로 local_backend는 로컬 전용 힌트입니다.
 local_backend: true
 
-site_url: /
+site_url: https://petfood.pe.kr
 logo_url: /petfood-mark.png
-display_url: /blog
+display_url: https://petfood.pe.kr/blog
 show_preview_links: true
 
 media_folder: public/uploads

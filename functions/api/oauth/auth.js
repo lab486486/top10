@@ -7,7 +7,7 @@
  * ※ 변수 저장 후 반드시 새 배포가 돌아가야 Functions에 반영됩니다.
  *
  * GitHub OAuth App Authorization callback URL:
- *   https://top10-4ri.pages.dev/api/oauth/callback
+ *   https://petfood.pe.kr/api/oauth/callback
  */
 function readGithubCreds(env) {
   const clientId =
