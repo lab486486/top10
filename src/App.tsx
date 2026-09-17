@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { type Species } from './data/products'
 import {
-  CLASS_TIERS,
+  getClassTiers,
+  getLadderSituations,
   LADDER_COPYRIGHT,
   LADDER_DISCLAIMER_LINES,
   LADDER_ONE_LINER,
-  LADDER_SITUATIONS,
   resolveBrandSpec,
   type TierBrand,
 } from './data/ladder'
@@ -28,10 +28,12 @@ export default function App() {
   const [path, setPath] = useState(readPath)
   const [scrollToGrades, setScrollToGrades] = useState(false)
 
+  const classTiers = useMemo(() => getClassTiers(species), [species])
   const brandCount = useMemo(
-    () => CLASS_TIERS.reduce((n, t) => n + t.brands.length, 0),
-    [],
+    () => classTiers.reduce((n, t) => n + t.brands.length, 0),
+    [classTiers],
   )
+  const situations = useMemo(() => getLadderSituations(species), [species])
 
   const speciesLabel = species === 'dog' ? '강아지' : '고양이'
   const blogSlug = path.startsWith('/blog') ? resolveBlogSlug(path) : null
@@ -204,7 +206,7 @@ export default function App() {
 
       <section className="toc" id="grade-toc" aria-label="등급 미리보기">
         <div className="toc__inner toc__inner--six">
-          {CLASS_TIERS.map((t) => (
+          {classTiers.map((t) => (
             <a
               key={t.code}
               className={`toc__item toc__item--${t.tone}`}
@@ -227,43 +229,35 @@ export default function App() {
           <p>{LADDER_ONE_LINER}</p>
         </div>
 
-        {species === 'cat' ? (
-          <div className="empty">
-            <p>고양이 계급도는 준비 중입니다. 강아지 서열을 먼저 보세요.</p>
-            <button type="button" onClick={() => setSpecies('dog')}>
-              강아지 계급도 보기
-            </button>
-          </div>
-        ) : (
-          CLASS_TIERS.map((tier) => (
-            <section
-              key={tier.code}
-              className={`tier tier--${tier.tone}`}
-              id={`tier-${tier.code}`}
-            >
-              <header className="tier__head">
-                <div className="tier__badge">
-                  <span className="tier__latin">{tier.latin}</span>
-                  <strong>{tier.name}</strong>
-                </div>
-                <div className="tier__meta">
-                  <p>{tier.blurb}</p>
-                  <span>{tier.brands.length}개 브랜드</span>
-                </div>
-              </header>
+        {classTiers.map((tier) => (
+          <section
+            key={`${species}-${tier.code}`}
+            className={`tier tier--${tier.tone}`}
+            id={`tier-${tier.code}`}
+          >
+            <header className="tier__head">
+              <div className="tier__badge">
+                <span className="tier__latin">{tier.latin}</span>
+                <strong>{tier.name}</strong>
+              </div>
+              <div className="tier__meta">
+                <p>{tier.blurb}</p>
+                <span>{tier.brands.length}개 브랜드</span>
+              </div>
+            </header>
 
-              <ol className="tier__grid">
-                {tier.brands.map((entry, index) => (
-                  <BrandEntry
-                    key={`${tier.code}-${entry.brand}`}
-                    entry={entry}
-                    place={index + 1}
-                  />
-                ))}
-              </ol>
-            </section>
-          ))
-        )}
+            <ol className="tier__grid">
+              {tier.brands.map((entry, index) => (
+                <BrandEntry
+                  key={`${species}-${tier.code}-${entry.brand}`}
+                  entry={entry}
+                  place={index + 1}
+                  species={species}
+                />
+              ))}
+            </ol>
+          </section>
+        ))}
       </main>
 
       <section className="situations" id="situations">
@@ -271,7 +265,7 @@ export default function App() {
           <h2>상황별로는 이렇게</h2>
           <p>윗등급이 모든 아이에게 최선은 아닙니다.</p>
           <ul>
-            {LADDER_SITUATIONS.map((s) => (
+            {situations.map((s) => (
               <li key={s.title}>
                 <strong>{s.title}</strong>
                 <span>{s.pick}</span>
@@ -344,9 +338,20 @@ export default function App() {
   )
 }
 
-function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
-  const spec = resolveBrandSpec(entry)
-  const href = spec?.coupangUrl
+function BrandEntry({
+  entry,
+  place,
+  species,
+}: {
+  entry: TierBrand
+  place: number
+  species: Species
+}) {
+  const spec = resolveBrandSpec(entry, species)
+  const kind = species === 'cat' ? '고양이 사료' : '강아지 사료'
+  const href =
+    spec?.coupangUrl ??
+    `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} ${kind}`)}`
   const review = spec?.reviewNote || spec?.summary
   const origin = resolveOrigin(entry.brand)
 
@@ -363,7 +368,7 @@ function BrandEntry({ entry, place }: { entry: TierBrand; place: number }) {
         <div className="brand-card__buy-col">
           <a
             className="brand-card__buy"
-            href={href ?? `https://www.coupang.com/np/search?q=${encodeURIComponent(`${entry.brand} 강아지 사료`)}`}
+            href={href}
             target="_blank"
             rel="noopener noreferrer sponsored"
           >
