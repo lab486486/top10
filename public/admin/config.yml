@@ -2,15 +2,16 @@ backend:
   name: github
   repo: lab486486/top10
   branch: main
-  # Cloudflare Pages에는 Git Gateway가 없으므로 GitHub OAuth 프록시(base_url)가 필요합니다.
-  # 아래 base_url을 배포한 OAuth Worker 주소로 교체하세요. (README 참고)
-  # base_url: https://YOUR-OAUTH-WORKER.example.com
-  # auth_endpoint: auth
+  # Cloudflare Pages Functions(/auth, /callback)를 OAuth 프록시로 사용.
+  # base_url 은 admin/index.html 에서 window.location.origin 으로 덮어씁니다.
+  auth_endpoint: auth
 
+# 로컬 글쓰기: npx decap-server 후 http://localhost:5173/admin
+# 운영에서는 Functions OAuth를 쓰므로 local_backend는 로컬 전용 힌트입니다.
 local_backend: true
 
 site_url: /
-logo_url: /favicon.svg
+logo_url: /petfood-mark.png
 display_url: /blog
 show_preview_links: true
 

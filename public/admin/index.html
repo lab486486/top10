@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
     <title>PETFOOD · 글쓰기</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,18 +14,42 @@
       rel="stylesheet"
     />
     <style>
-      /* Decap 에디터 UI 살짝 정리 */
       html,
       body {
         margin: 0;
         min-height: 100%;
         background: #f4f7f2;
       }
+
+      /* 로그인 화면 로고 크기 정리 */
+      img[alt='Logo'] {
+        max-width: 120px !important;
+        height: auto !important;
+        object-fit: contain;
+      }
     </style>
+    <script>
+      // config.yml 로드 후 backend.base_url 을 현재 도메인으로 덮어쓰기 위해 수동 초기화
+      window.CMS_MANUAL_INIT = true
+    </script>
   </head>
   <body>
     <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
     <script>
+      CMS.init({
+        config: {
+          load_config_file: true,
+          backend: {
+            name: 'github',
+            repo: 'lab486486/top10',
+            branch: 'main',
+            base_url: window.location.origin,
+            auth_endpoint: 'auth',
+          },
+          logo_url: '/petfood-mark.png',
+        },
+      })
+
       CMS.registerPreviewStyle('/admin/preview.css')
 
       var PostPreview = createClass({

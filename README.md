@@ -37,47 +37,36 @@ npx decap-server
 
 `public/admin/config.yml`에 `local_backend: true`가 켜져 있어야 합니다.
 
-### 운영(Cloudflare Pages)에서 GitHub 연동 — 직접 조치 필요
+### 운영(Cloudflare Pages)에서 GitHub 연동
 
-Cloudflare Pages에는 Netlify Identity / Git Gateway가 **없습니다**.  
-Decap이 GitHub에 커밋하려면 **GitHub OAuth App + OAuth 프록시(Worker)** 가 필요합니다.
+Cloudflare Pages에는 Netlify Identity가 **없습니다**.  
+`api.netlify.com/auth` 로 가면 **Not Found** 가 정상입니다.
+
+이 저장소는 Pages Functions(`/auth`, `/callback`)로 GitHub OAuth를 처리합니다.
 
 1. **GitHub OAuth App 생성**
    - GitHub → Settings → Developer settings → OAuth Apps → New
-   - Homepage URL: Cloudflare Pages 도메인 (예: `https://petfood.pages.dev`)
-   - Authorization callback URL: OAuth Worker 콜백  
-     예: `https://YOUR-OAUTH-WORKER.workers.dev/callback`
+   - Application name: `PETFOOD Decap` (자유)
+   - Homepage URL: `https://top10-4ri.pages.dev` (또는 커스텀 도메인)
+   - Authorization callback URL: `https://top10-4ri.pages.dev/callback`  
+     (커스텀 도메인을 쓰면 그 도메인의 `/callback` 도 추가)
    - Client ID / Client Secret 발급
 
-2. **Cloudflare Worker OAuth 프록시 배포**
-   - 예: [decap-cms GitHub backend 가이드](https://decapcms.org/docs/github-backend/) 또는  
-     커뮤니티 Worker (`cloudflare-workers-oauth` / `cms-oauth` 계열)
-   - Worker 환경변수에 `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` 설정
-   - Pages 도메인을 허용 오리진에 포함
+2. **Cloudflare Pages 환경변수**
+   - Workers & Pages → `petfood`(또는 해당 프로젝트) → Settings → Environment variables
+   - Production에 추가:
+     - `GITHUB_CLIENT_ID` = OAuth App Client ID
+     - `GITHUB_CLIENT_SECRET` = OAuth App Client Secret
+   - 저장 후 **재배포** (환경변수만 넣으면 기존 배포에 안 붙을 수 있음)
 
-3. **`public/admin/config.yml` 수정 (머지 후 main 기준)**
+3. **확인**
+   - `https://top10-4ri.pages.dev/admin/` 접속
+   - Login with GitHub → 팝업이 **같은 도메인** `/auth` 로 열려야 함 (netlify.com 이면 안 됨)
+   - 로그인 GitHub 계정은 `lab486486/top10` **push 권한** 필요
 
-```yml
-backend:
-  name: github
-  repo: lab486486/top10
-  branch: main
-  base_url: https://YOUR-OAUTH-WORKER.workers.dev
-  auth_endpoint: auth
+로컬 글쓰기(`npx decap-server`)는 OAuth 없이 가능합니다.
 
-# 운영에서는 local_backend를 끄거나 삭제
-# local_backend: true
-```
-
-4. **Pages ↔ GitHub**
-   - Cloudflare Pages가 `lab486486/top10`에 연결되어 있어야 CMS 커밋 후 자동 재배포됩니다.
-   - Production 브랜치: `main`
-   - Build: `npm run build` / Output: `dist`
-
-5. **권한**
-   - `/admin`에 로그인하는 GitHub 계정은 해당 저장소 **push 권한**이 있어야 합니다.
-
-OAuth Worker·Client Secret은 이 저장소에 올리지 마세요.
+OAuth Client Secret은 이 저장소에 올리지 마세요.
 
 ## Cloudflare Pages 배포
 
