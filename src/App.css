@@ -1419,14 +1419,16 @@ button {
   }
 
   .hero-mark {
-    width: 72px;
-    height: 72px;
+    width: 52px;
+    height: 52px;
     margin-bottom: 0;
   }
 
   /*
    * 모바일: 강아지/고양이 사진 경계(50%) 기준
-   * 위(강아지) = 로고 + PETFOOD / 아래(고양이) = 제목 + 리드
+   * 위(강아지) = 로고 + PETFOOD → 하단 정렬
+   * 아래(고양이) = 제목 + 리드 → 상단 정렬
+   * → 4줄이 경계선에 모임
    */
   .hero > .hero__center {
     --hero-rail-w: 3.6rem;
@@ -1450,24 +1452,25 @@ button {
   .hero__brand-block {
     align-content: end;
     justify-items: center;
-    gap: 0.12rem;
-    padding: 0 0 0.2rem;
+    gap: 0.06rem;
+    padding: 0 0 0.12rem;
   }
 
   .hero__copy-block {
     align-content: start;
     justify-items: center;
-    gap: 0.12rem;
-    padding: 0.2rem 0 0;
+    gap: 0.1rem;
+    padding: 0.12rem 0 0;
   }
 
   .hero__brand {
     letter-spacing: 0.28em;
     text-indent: 0.28em;
+    font-size: 0.88rem;
   }
 
   .hero h1 {
-    font-size: clamp(1.7rem, 7.2vw, 2.25rem);
+    font-size: clamp(1.55rem, 6.6vw, 2.05rem);
     line-height: 1;
     text-shadow:
       0 1px 2px rgba(0, 0, 0, 0.55),
@@ -1476,7 +1479,7 @@ button {
 
   .hero__lead {
     margin-top: 0;
-    font-size: 0.9rem;
+    font-size: 0.84rem;
     line-height: 1.25;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
