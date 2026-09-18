@@ -287,6 +287,9 @@ export default function App() {
             </a>
           ))}
         </div>
+        <p className="toc__affiliate">
+          제휴 링크를 통해 구매 시 수수료를 받을 수 있습니다.
+        </p>
       </section>
 
       <main className="ladder" id="ladder">
