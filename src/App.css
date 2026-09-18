@@ -292,6 +292,7 @@ button {
   object-fit: cover;
   display: block;
   transform: scale(1.08);
+  transition: filter 0.35s ease, opacity 0.35s ease;
 }
 
 .hero__panel--dog img {
@@ -300,6 +301,13 @@ button {
 
 .hero__panel--cat img {
   object-position: 72% 32%;
+}
+
+/* 선택 종만 컬러, 비선택 종 사진은 흑백 */
+.hero--dog .hero__panel--cat img,
+.hero--cat .hero__panel--dog img {
+  filter: grayscale(1);
+  opacity: 0.72;
 }
 
 .hero__veil {
@@ -1438,18 +1446,19 @@ button {
     animation-name: hero-in-fade;
   }
 
+  /* 경계선으로 4줄 밀착: 위쪽은 하단 정렬, 아래쪽은 상단 정렬 */
   .hero__brand-block {
-    align-content: center;
+    align-content: end;
     justify-items: center;
-    gap: 0.2rem;
-    padding: 0.55rem 0 0.35rem;
+    gap: 0.12rem;
+    padding: 0 0 0.2rem;
   }
 
   .hero__copy-block {
-    align-content: center;
+    align-content: start;
     justify-items: center;
-    gap: 0.18rem;
-    padding: 0.35rem 0 0.55rem;
+    gap: 0.12rem;
+    padding: 0.2rem 0 0;
   }
 
   .hero__brand {

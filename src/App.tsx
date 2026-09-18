@@ -219,7 +219,7 @@ export default function App() {
         </>
       ) : (
         <>
-      <section className="hero" id="top">
+      <section className={`hero hero--${species}`} id="top">
         <div className="hero__panels" aria-hidden="true">
           <div className="hero__panel hero__panel--dog">
             <img src={heroDog} alt="" />
